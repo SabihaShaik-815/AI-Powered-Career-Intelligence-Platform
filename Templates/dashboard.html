@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareerCast - Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark">CC</div>
+            <div class="brand-name">Career<span>Cast</span></div>
+        </div>
+        <div class="topbar-right">
+            <span class="user-greeting">Hi, {{ user_name }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-ghost">Log out</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <h1>Upload Resume for Instant Output</h1>
+            <p class="subtitle">
+                Upload a resume to extract skills, education, and get a live role
+                prediction from the trained Logistic Regression model.
+            </p>
+        </section>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="upload">Upload</button>
+            <button class="tab-btn" data-tab="results">Parsing &amp; Prediction</button>
+            <button class="tab-btn" data-tab="profile">Profile Form</button>
+        </nav>
+
+        <!-- TAB: Upload -->
+        <section class="tab-panel active" id="tab-upload">
+            <div class="card">
+                <h3>Upload Resume</h3>
+                <div class="dropzone" id="dropzone">
+                    <p><strong>Click or drag & drop your resume file here</strong></p>
+                    <p class="dropzone-hint">Supports PDF, DOCX, and TXT files</p>
+                    <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" hidden>
+                </div>
+
+                <div class="or-divider">or paste resume text directly</div>
+                <textarea id="resumeText" rows="8" placeholder="Paste resume text here..."></textarea>
+
+                <button id="analyzeBtn" class="btn-primary" style="margin-top:12px;">Analyze Resume</button>
+                <div id="analyzeStatus" class="status-msg"></div>
+            </div>
+        </section>
+
+        <!-- TAB: Results -->
+        <section class="tab-panel" id="tab-results">
+            <div id="noResults" class="empty-state">
+                Upload or paste a resume in the <strong>Upload</strong> tab first.
+            </div>
+
+            <div id="resultsGrid" class="results-grid" style="display:none;">
+                <div class="card">
+                    <h3>Resume Parsing (spaCy NER)</h3>
+                    <div id="parsedText" class="parsed-text"></div>
+
+                    <h4>Detected skills</h4>
+                    <div id="skillBadges" class="badge-row"></div>
+
+                    <h4>Extracted education</h4>
+                    <ul id="educationList" class="edu-list"></ul>
+                </div>
+
+                <div class="card">
+                    <h3>Prediction Results</h3>
+                    <p class="muted">Logistic Regression Model</p>
+                    <div id="predictionBars"></div>
+
+                    <div class="best-card">
+                        <div class="best-label">Best Suited Career</div>
+                        <div class="best-role" id="bestRole">—</div>
+                        <div class="best-conf" id="bestConf"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="skillGapCard" class="card" style="display:none;">
+                <h3>Skill Gap Analysis <span id="skillGapRole"></span></h3>
+                <h4>Matched skills</h4>
+                <div id="matchedBadges" class="badge-row"></div>
+                <h4>Missing skills</h4>
+                <div id="missingBadges" class="badge-row"></div>
+            </div>
+        </section>
+
+        <!-- TAB: Profile Form -->
+        <section class="tab-panel" id="tab-profile">
+            <div class="card">
+                <h3>Profile Form</h3>
+                <form id="profileForm" class="profile-form">
+                    <div class="form-row">
+                        <div>
+                            <label>Full name</label>
+                            <input type="text" name="name" id="pf_name">
+                        </div>
+                        <div>
+                            <label>Email</label>
+                            <input type="email" name="email" id="pf_email">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Years of experience</label>
+                            <input type="number" name="years_experience" id="pf_years" min="0" max="60" step="0.5">
+                        </div>
+                        <div>
+                            <label>Highest education level</label>
+                            <select name="education_level" id="pf_education">
+                                <option value="high school">High school</option>
+                                <option value="associate">Associate</option>
+                                <option value="bachelor">Bachelor</option>
+                                <option value="master">Master</option>
+                                <option value="phd">PhD</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Skills (comma-separated)</label>
+                            <input type="text" name="skills" id="pf_skills">
+                        </div>
+                        <div>
+                            <label>Current role (optional)</label>
+                            <input type="text" name="current_role" id="pf_current_role">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div>
+                            <label>Desired role (optional)</label>
+                            <input type="text" name="desired_role" id="pf_desired_role">
+                        </div>
+                        <div>
+                            <label>Location (optional)</label>
+                            <input type="text" name="location" id="pf_location">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Save Profile</button>
+                    <div id="profileStatus" class="status-msg"></div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+{
+  "accuracy": 0.9838082901554405,
+  "classification_report": {
+    "Accountant": {
+      "precision": 1.0,
+      "recall": 0.9961977186311787,
+      "f1-score": 0.9980952380952381,
+      "support": 263.0
+    },
+    "Administrative Assistant": {
+      "precision": 1.0,
+      "recall": 0.9950738916256158,
+      "f1-score": 0.9975308641975309,
+      "support": 203.0
+    },
+    "Backend Developer": {
+      "precision": 0.8947368421052632,
+      "recall": 0.68,
+      "f1-score": 0.7727272727272727,
+      "support": 25.0
+    },
+    "Business Analyst": {
+      "precision": 0.956140350877193,
+      "recall": 0.990909090909091,
+      "f1-score": 0.9732142857142857,
+      "support": 110.0
+    },
+    "Customer Service Representative": {
+      "precision": 0.9866666666666667,
+      "recall": 0.9801324503311258,
+      "f1-score": 0.9833887043189369,
+      "support": 151.0
+    },
+    "Data Analyst": {
+      "precision": 0.9620253164556962,
+      "recall": 0.9382716049382716,
+      "f1-score": 0.95,
+      "support": 81.0
+    },
+    "Data Scientist": {
+      "precision": 0.9795918367346939,
+      "recall": 0.9795918367346939,
+      "f1-score": 0.9795918367346939,
+      "support": 49.0
+    },
+    "DevOps Engineer": {
+      "precision": 1.0,
+      "recall": 0.9714285714285714,
+      "f1-score": 0.9855072463768116,
+      "support": 35.0
+    },
+    "Frontend Developer": {
+      "precision": 0.8888888888888888,
+      "recall": 0.9230769230769231,
+      "f1-score": 0.9056603773584906,
+      "support": 26.0
+    },
+    "Full Stack Developer": {
+      "precision": 0.9545454545454546,
+      "recall": 0.8936170212765957,
+      "f1-score": 0.9230769230769231,
+      "support": 47.0
+    },
+    "Machine Learning Engineer": {
+      "precision": 0.9411764705882353,
+      "recall": 0.8421052631578947,
+      "f1-score": 0.8888888888888888,
+      "support": 19.0
+    },
+    "Marketing Manager": {
+      "precision": 0.9473684210526315,
+      "recall": 0.935064935064935,
+      "f1-score": 0.9411764705882353,
+      "support": 77.0
+    },
+    "Product Manager": {
+      "precision": 0.9519230769230769,
+      "recall": 0.9705882352941176,
+      "f1-score": 0.9611650485436893,
+      "support": 102.0
+    },
+    "Project Manager": {
+      "precision": 0.995049504950495,
+      "recall": 0.9925925925925926,
+      "f1-score": 0.9938195302843016,
+      "support": 405.0
+    },
+    "Registered Nurse": {
+      "precision": 0.9923809523809524,
+      "recall": 1.0,
+      "f1-score": 0.9961759082217974,
+      "support": 521.0
+    },
+    "Sales Representative": {
+      "precision": 0.9970501474926253,
+      "recall": 0.9970501474926253,
+      "f1-score": 0.9970501474926253,
+      "support": 678.0
+    },
+    "Software Engineer": {
+      "precision": 0.9539473684210527,
+      "recall": 0.9797297297297297,
+      "f1-score": 0.9666666666666667,
+      "support": 296.0
+    },
+    "accuracy": 0.9838082901554405,
+    "macro avg": {
+      "precision": 0.9647936057695837,
+      "recall": 0.945025294840233,
+      "f1-score": 0.9537491417227286,
+      "support": 3088.0
+    },
+    "weighted avg": {
+      "precision": 0.9837270551748347,
+      "recall": 0.9838082901554405,
+      "f1-score": 0.9835725397755359,
+      "support": 3088.0
+    }
+  }
+}
