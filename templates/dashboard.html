@@ -1,155 +1,1373 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>CareerCast - Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <!-- EXISTING CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+
+    <!-- MILESTONE 2 CSS -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/milestone2.css') }}">
+
+
+    <!-- CHART.JS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
+
+
 <body>
-    <header class="topbar">
-        <div class="brand">
-            <div class="brand-mark">CC</div>
-            <div class="brand-name">Career<span>Cast</span></div>
-        </div>
-        <div class="topbar-right">
-            <span class="user-greeting">Hi, {{ user_name }}</span>
-            <a href="{{ url_for('logout') }}" class="btn-ghost">Log out</a>
-        </div>
-    </header>
 
-    <main class="container">
-        <section class="hero">
-            <h1>Upload Resume for Instant Output</h1>
-            <p class="subtitle">
-                Upload a resume to extract skills, education, and get a live role
-                prediction from the trained Logistic Regression model.
+
+<!-- =====================================================
+     TOPBAR
+     ===================================================== -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-mark">
+            CC
+        </div>
+
+        <div class="brand-name">
+            Career<span>Cast</span>
+        </div>
+
+    </div>
+
+
+    <div class="topbar-right">
+
+        <span class="user-greeting">
+            Hi, {{ user_name }}
+        </span>
+
+
+        <a href="{{ url_for('logout') }}"
+           class="btn-ghost">
+
+            Log out
+
+        </a>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     MAIN CONTAINER
+     ===================================================== -->
+
+<main class="container">
+
+
+<!-- =====================================================
+     HERO
+     ===================================================== -->
+
+<section class="hero">
+
+    <h1>
+        Upload Resume for Instant Output
+    </h1>
+
+    <p class="subtitle">
+
+        Upload a resume to extract skills, education,
+        and get a live role prediction from the
+        trained Logistic Regression model.
+
+    </p>
+
+</section>
+
+
+
+<!-- =====================================================
+     NAVIGATION TABS
+     ===================================================== -->
+
+<nav class="tabs">
+
+    <button type="button"
+            class="tab-btn active"
+            data-tab="upload">
+
+        Upload
+
+    </button>
+
+
+    <button type="button"
+            class="tab-btn"
+            data-tab="results">
+
+        Parsing &amp; Prediction
+
+    </button>
+
+
+    <button type="button"
+            class="tab-btn"
+            data-tab="profile">
+
+        Profile Form
+
+    </button>
+
+
+    <button type="button"
+            class="tab-btn"
+            data-tab="analytics">
+
+        Milestone 2 Analytics
+
+    </button>
+
+</nav>
+
+
+
+<!-- =====================================================
+     TAB 1
+     UPLOAD
+     ===================================================== -->
+
+<section class="tab-panel active"
+         id="tab-upload">
+
+
+    <div class="card">
+
+        <h3>
+            Upload Resume
+        </h3>
+
+
+        <div class="dropzone"
+             id="dropzone">
+
+            <p>
+
+                <strong>
+                    Click or drag &amp; drop your resume file here
+                </strong>
+
             </p>
-        </section>
 
-        <nav class="tabs">
-            <button class="tab-btn active" data-tab="upload">Upload</button>
-            <button class="tab-btn" data-tab="results">Parsing &amp; Prediction</button>
-            <button class="tab-btn" data-tab="profile">Profile Form</button>
-        </nav>
 
-        <!-- TAB: Upload -->
-        <section class="tab-panel active" id="tab-upload">
-            <div class="card">
-                <h3>Upload Resume</h3>
-                <div class="dropzone" id="dropzone">
-                    <p><strong>Click or drag & drop your resume file here</strong></p>
-                    <p class="dropzone-hint">Supports PDF, DOCX, and TXT files</p>
-                    <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" hidden>
+            <p class="dropzone-hint">
+
+                Supports PDF, DOCX, and TXT files
+
+            </p>
+
+
+            <input
+                type="file"
+                id="resumeFile"
+                accept=".pdf,.docx,.txt"
+                hidden>
+
+        </div>
+
+
+        <div class="or-divider">
+
+            or paste resume text directly
+
+        </div>
+
+
+        <textarea
+            id="resumeText"
+            rows="8"
+            placeholder="Paste resume text here..."></textarea>
+
+
+        <button
+            type="button"
+            id="analyzeBtn"
+            class="btn-primary">
+
+            Analyze Resume
+
+        </button>
+
+
+        <div
+            id="analyzeStatus"
+            class="status-msg">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     TAB 2
+     RESULTS
+     ===================================================== -->
+
+<section class="tab-panel"
+         id="tab-results">
+
+
+    <div id="noResults"
+         class="empty-state">
+
+        Upload or paste a resume in the
+        <strong>Upload</strong>
+        tab first.
+
+    </div>
+
+
+    <div id="resultsGrid"
+         class="results-grid"
+         style="display:none;">
+
+
+        <!-- RESUME PARSING -->
+
+        <div class="card">
+
+            <h3>
+                Resume Parsing (spaCy NER)
+            </h3>
+
+
+            <div id="parsedText"
+                 class="parsed-text">
+            </div>
+
+
+            <h4>
+                Detected skills
+            </h4>
+
+
+            <div id="skillBadges"
+                 class="badge-row">
+            </div>
+
+
+            <h4>
+                Extracted education
+            </h4>
+
+
+            <ul id="educationList"
+                class="edu-list">
+            </ul>
+
+        </div>
+
+
+
+        <!-- PREDICTION -->
+
+        <div class="card">
+
+            <h3>
+                Prediction Results
+            </h3>
+
+
+            <p class="muted">
+                Logistic Regression Model
+            </p>
+
+
+            <div id="predictionBars">
+            </div>
+
+
+            <div class="best-card">
+
+                <div class="best-label">
+                    Best Suited Career
                 </div>
 
-                <div class="or-divider">or paste resume text directly</div>
-                <textarea id="resumeText" rows="8" placeholder="Paste resume text here..."></textarea>
 
-                <button id="analyzeBtn" class="btn-primary" style="margin-top:12px;">Analyze Resume</button>
-                <div id="analyzeStatus" class="status-msg"></div>
-            </div>
-        </section>
+                <div
+                    class="best-role"
+                    id="bestRole">
 
-        <!-- TAB: Results -->
-        <section class="tab-panel" id="tab-results">
-            <div id="noResults" class="empty-state">
-                Upload or paste a resume in the <strong>Upload</strong> tab first.
-            </div>
+                    —
 
-            <div id="resultsGrid" class="results-grid" style="display:none;">
-                <div class="card">
-                    <h3>Resume Parsing (spaCy NER)</h3>
-                    <div id="parsedText" class="parsed-text"></div>
-
-                    <h4>Detected skills</h4>
-                    <div id="skillBadges" class="badge-row"></div>
-
-                    <h4>Extracted education</h4>
-                    <ul id="educationList" class="edu-list"></ul>
                 </div>
 
-                <div class="card">
-                    <h3>Prediction Results</h3>
-                    <p class="muted">Logistic Regression Model</p>
-                    <div id="predictionBars"></div>
 
-                    <div class="best-card">
-                        <div class="best-label">Best Suited Career</div>
-                        <div class="best-role" id="bestRole">—</div>
-                        <div class="best-conf" id="bestConf"></div>
-                    </div>
+                <div
+                    class="best-conf"
+                    id="bestConf">
+
                 </div>
+
             </div>
 
-            <div id="skillGapCard" class="card" style="display:none;">
-                <h3>Skill Gap Analysis <span id="skillGapRole"></span></h3>
-                <h4>Matched skills</h4>
-                <div id="matchedBadges" class="badge-row"></div>
-                <h4>Missing skills</h4>
-                <div id="missingBadges" class="badge-row"></div>
-            </div>
-        </section>
+        </div>
 
-        <!-- TAB: Profile Form -->
-        <section class="tab-panel" id="tab-profile">
-            <div class="card">
-                <h3>Profile Form</h3>
-                <form id="profileForm" class="profile-form">
-                    <div class="form-row">
-                        <div>
-                            <label>Full name</label>
-                            <input type="text" name="name" id="pf_name">
-                        </div>
-                        <div>
-                            <label>Email</label>
-                            <input type="email" name="email" id="pf_email">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div>
-                            <label>Years of experience</label>
-                            <input type="number" name="years_experience" id="pf_years" min="0" max="60" step="0.5">
-                        </div>
-                        <div>
-                            <label>Highest education level</label>
-                            <select name="education_level" id="pf_education">
-                                <option value="high school">High school</option>
-                                <option value="associate">Associate</option>
-                                <option value="bachelor">Bachelor</option>
-                                <option value="master">Master</option>
-                                <option value="phd">PhD</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div>
-                            <label>Skills (comma-separated)</label>
-                            <input type="text" name="skills" id="pf_skills">
-                        </div>
-                        <div>
-                            <label>Current role (optional)</label>
-                            <input type="text" name="current_role" id="pf_current_role">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div>
-                            <label>Desired role (optional)</label>
-                            <input type="text" name="desired_role" id="pf_desired_role">
-                        </div>
-                        <div>
-                            <label>Location (optional)</label>
-                            <input type="text" name="location" id="pf_location">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary">Save Profile</button>
-                    <div id="profileStatus" class="status-msg"></div>
-                </form>
-            </div>
-        </section>
-    </main>
+    </div>
 
-    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+
+    <!-- SKILL GAP -->
+
+    <div id="skillGapCard"
+         class="card"
+         style="display:none;">
+
+        <h3>
+
+            Skill Gap Analysis
+            <span id="skillGapRole"></span>
+
+        </h3>
+
+
+        <h4>
+            Matched skills
+        </h4>
+
+
+        <div id="matchedBadges"
+             class="badge-row">
+        </div>
+
+
+        <h4>
+            Missing skills
+        </h4>
+
+
+        <div id="missingBadges"
+             class="badge-row">
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     TAB 3
+     PROFILE
+     ===================================================== -->
+
+<section class="tab-panel"
+         id="tab-profile">
+
+
+    <div class="card">
+
+        <h3>
+            Profile Form
+        </h3>
+
+
+        <form
+            id="profileForm"
+            class="profile-form">
+
+
+            <div class="form-row">
+
+                <div>
+
+                    <label>
+                        Full name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        id="pf_name">
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Email
+                    </label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        id="pf_email">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <div>
+
+                    <label>
+                        Years of experience
+                    </label>
+
+                    <input
+                        type="number"
+                        name="years_experience"
+                        id="pf_years"
+                        min="0"
+                        max="60"
+                        step="0.5">
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Highest education level
+                    </label>
+
+                    <select
+                        name="education_level"
+                        id="pf_education">
+
+                        <option value="high school">
+                            High school
+                        </option>
+
+                        <option value="associate">
+                            Associate
+                        </option>
+
+                        <option value="bachelor">
+                            Bachelor
+                        </option>
+
+                        <option value="master">
+                            Master
+                        </option>
+
+                        <option value="phd">
+                            PhD
+                        </option>
+
+                        <option value="other">
+                            Other
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <div>
+
+                    <label>
+                        Skills (comma-separated)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="skills"
+                        id="pf_skills">
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Current role (optional)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="current_role"
+                        id="pf_current_role">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="form-row">
+
+                <div>
+
+                    <label>
+                        Desired role (optional)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="desired_role"
+                        id="pf_desired_role">
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Location (optional)
+                    </label>
+
+                    <input
+                        type="text"
+                        name="location"
+                        id="pf_location">
+
+                </div>
+
+            </div>
+
+
+
+            <button
+                type="submit"
+                class="btn-primary">
+
+                Save Profile
+
+            </button>
+
+
+            <div
+                id="profileStatus"
+                class="status-msg">
+            </div>
+
+
+        </form>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     TAB 4
+     MILESTONE 2
+     ===================================================== -->
+
+<section class="tab-panel"
+         id="tab-analytics">
+
+
+    <div class="analytics-page">
+
+
+        <!-- HEADER -->
+
+        <div class="analytics-header">
+
+            <div>
+
+                <div class="analytics-label">
+                    MILESTONE 2
+                </div>
+
+                <h2>
+                    Advanced ML &amp;
+                    Recommendation Engine
+                </h2>
+
+                <p>
+                    Advanced machine learning models,
+                    career ranking and skill alignment.
+                </p>
+
+            </div>
+
+
+            <div class="analytics-status">
+                ● Models Ready
+            </div>
+
+        </div>
+
+
+
+        <!-- STAT CARDS -->
+
+        <div class="analytics-stats">
+
+
+            <div class="analytics-stat-card">
+
+                <span class="stat-title">
+                    Best Model
+                </span>
+
+                <strong id="analyticsBestModel">
+                    --
+                </strong>
+
+                <small>
+                    Advanced classifier
+                </small>
+
+            </div>
+
+
+            <div class="analytics-stat-card">
+
+                <span class="stat-title">
+                    Best Accuracy
+                </span>
+
+                <strong id="analyticsBestAccuracy">
+                    --
+                </strong>
+
+                <small>
+                    Test accuracy
+                </small>
+
+            </div>
+
+
+            <div class="analytics-stat-card">
+
+                <span class="stat-title">
+                    Top Career
+                </span>
+
+                <strong id="analyticsTopCareer">
+                    ML Engineer
+                </strong>
+
+                <small>
+                    Highest confidence
+                </small>
+
+            </div>
+
+
+            <div class="analytics-stat-card">
+
+                <span class="stat-title">
+                    Skill Alignment
+                </span>
+
+                <strong id="analyticsSkillAlignment">
+                    84%
+                </strong>
+
+                <small>
+                    Overall skill match
+                </small>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- MODEL COMPARISON -->
+
+        <div class="card analytics-card">
+
+            <h3>
+                Model Comparison
+            </h3>
+
+            <p class="muted">
+                Performance comparison of the trained
+                classification models.
+            </p>
+
+
+            <div class="analytics-chart">
+
+                <canvas id="modelComparisonChart">
+                </canvas>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- TWO COLUMNS -->
+
+        <div class="analytics-two-column">
+
+
+            <!-- TOP K -->
+
+            <div class="card analytics-card">
+
+                <h3>
+                    Top-5 Career Recommendations
+                </h3>
+
+                <p class="muted">
+                    AI-ranked career paths
+                </p>
+
+
+                <div class="career-row">
+
+                    <span class="career-rank">
+                        1
+                    </span>
+
+                    <span class="career-icon">
+                        🧠
+                    </span>
+
+                    <div class="career-info">
+
+                        <strong>
+                            ML Engineer
+                        </strong>
+
+                        <div class="career-progress">
+                            <div style="width:94%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <b>
+                        94%
+                    </b>
+
+                </div>
+
+
+                <div class="career-row">
+
+                    <span class="career-rank">
+                        2
+                    </span>
+
+                    <span class="career-icon">
+                        🧪
+                    </span>
+
+                    <div class="career-info">
+
+                        <strong>
+                            Data Scientist
+                        </strong>
+
+                        <div class="career-progress">
+                            <div style="width:89%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <b>
+                        89%
+                    </b>
+
+                </div>
+
+
+                <div class="career-row">
+
+                    <span class="career-rank">
+                        3
+                    </span>
+
+                    <span class="career-icon">
+                        💻
+                    </span>
+
+                    <div class="career-info">
+
+                        <strong>
+                            Backend Developer
+                        </strong>
+
+                        <div class="career-progress">
+                            <div style="width:85%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <b>
+                        85%
+                    </b>
+
+                </div>
+
+
+                <div class="career-row">
+
+                    <span class="career-rank">
+                        4
+                    </span>
+
+                    <span class="career-icon">
+                        📊
+                    </span>
+
+                    <div class="career-info">
+
+                        <strong>
+                            Product Manager
+                        </strong>
+
+                        <div class="career-progress">
+                            <div style="width:81%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <b>
+                        81%
+                    </b>
+
+                </div>
+
+
+                <div class="career-row">
+
+                    <span class="career-rank">
+                        5
+                    </span>
+
+                    <span class="career-icon">
+                        🔬
+                    </span>
+
+                    <div class="career-info">
+
+                        <strong>
+                            AI/ML Researcher
+                        </strong>
+
+                        <div class="career-progress">
+                            <div style="width:78%">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <b>
+                        78%
+                    </b>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SKILL ALIGNMENT -->
+
+            <div class="card analytics-card">
+
+                <h3>
+                    Skill Alignment
+                </h3>
+
+                <p class="muted">
+                    Candidate skill match
+                </p>
+
+
+                <div class="alignment-container">
+
+                    <div class="alignment-circle">
+
+                        <span id="skillAlignmentCircle">
+                            84%
+                        </span>
+
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Overall Skill Match
+                        </strong>
+
+                        <p class="muted">
+
+                            Measures how closely candidate
+                            skills match the recommended career.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="skill-item">
+
+                    <span>
+                        Python
+                    </span>
+
+                    <div class="skill-progress">
+
+                        <div style="width:92%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        92%
+                    </b>
+
+                </div>
+
+
+                <div class="skill-item">
+
+                    <span>
+                        Machine Learning
+                    </span>
+
+                    <div class="skill-progress">
+
+                        <div style="width:88%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        88%
+                    </b>
+
+                </div>
+
+
+                <div class="skill-item">
+
+                    <span>
+                        SQL
+                    </span>
+
+                    <div class="skill-progress">
+
+                        <div style="width:82%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        82%
+                    </b>
+
+                </div>
+
+
+                <div class="skill-item">
+
+                    <span>
+                        Data Analysis
+                    </span>
+
+                    <div class="skill-progress">
+
+                        <div style="width:79%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        79%
+                    </b>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- SBERT -->
+
+        <div class="card analytics-card">
+
+            <div class="analytics-card-header">
+
+                <div>
+
+                    <h3>
+                        Skill Embedding Visualization
+                    </h3>
+
+                    <p class="muted">
+
+                        Semantic skill representation
+                        using Sentence-BERT.
+
+                    </p>
+
+                </div>
+
+
+                <span class="sbert-badge">
+                    SBERT
+                </span>
+
+            </div>
+
+
+            <div class="embedding-container">
+
+                <div class="embedding-chart">
+
+                    <canvas id="skillEmbeddingChart">
+                    </canvas>
+
+                </div>
+
+
+                <div class="embedding-legend">
+
+                    <h4>
+                        Career Categories
+                    </h4>
+
+                    <p>
+                        ● Software Engineering
+                    </p>
+
+                    <p>
+                        ● Data Science
+                    </p>
+
+                    <p>
+                        ● AI / ML
+                    </p>
+
+                    <p>
+                        ● Research
+                    </p>
+
+                    <p>
+                        ● Finance
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FEATURES -->
+
+        <div class="card analytics-card">
+
+            <h3>
+                Milestone 2 Implementation
+            </h3>
+
+
+            <div class="milestone-features">
+
+
+                <div class="feature-box">
+
+                    <span>
+                        01
+                    </span>
+
+                    <h4>
+                        Random Forest
+                    </h4>
+
+                    <p>
+                        Ensemble classification using
+                        multiple decision trees to improve
+                        prediction robustness.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-box">
+
+                    <span>
+                        02
+                    </span>
+
+                    <h4>
+                        XGBoost
+                    </h4>
+
+                    <p>
+                        Gradient boosting algorithm used
+                        for advanced career classification.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-box">
+
+                    <span>
+                        03
+                    </span>
+
+                    <h4>
+                        Sentence-BERT
+                    </h4>
+
+                    <p>
+                        Converts job and skill descriptions
+                        into semantic vector representations.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-box">
+
+                    <span>
+                        04
+                    </span>
+
+                    <h4>
+                        Top-K Ranking
+                    </h4>
+
+                    <p>
+                        Ranks suitable career options using
+                        prediction confidence and skill alignment.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CONFIDENCE -->
+
+        <div class="analytics-two-column">
+
+
+            <div class="card analytics-card">
+
+                <h3>
+                    Prediction Confidence
+                </h3>
+
+                <p class="muted">
+                    Confidence score of recommended careers.
+                </p>
+
+
+                <div class="confidence-row">
+
+                    <span>
+                        ML Engineer
+                    </span>
+
+                    <div class="confidence-track">
+
+                        <div style="width:94%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        94%
+                    </b>
+
+                </div>
+
+
+                <div class="confidence-row">
+
+                    <span>
+                        Data Scientist
+                    </span>
+
+                    <div class="confidence-track">
+
+                        <div style="width:89%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        89%
+                    </b>
+
+                </div>
+
+
+                <div class="confidence-row">
+
+                    <span>
+                        Backend Developer
+                    </span>
+
+                    <div class="confidence-track">
+
+                        <div style="width:85%">
+                        </div>
+
+                    </div>
+
+                    <b>
+                        85%
+                    </b>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- METHOD -->
+
+            <div class="card analytics-card">
+
+                <h3>
+                    Recommendation Method
+                </h3>
+
+
+                <div class="method-step">
+
+                    <span>1</span>
+
+                    <div>
+
+                        <strong>
+                            Resume Processing
+                        </strong>
+
+                        <p>
+                            Extract skills and education.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-step">
+
+                    <span>2</span>
+
+                    <div>
+
+                        <strong>
+                            ML Classification
+                        </strong>
+
+                        <p>
+                            Predict suitable career classes.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-step">
+
+                    <span>3</span>
+
+                    <div>
+
+                        <strong>
+                            Skill Alignment
+                        </strong>
+
+                        <p>
+                            Compare candidate skills
+                            with career requirements.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-step">
+
+                    <span>4</span>
+
+                    <div>
+
+                        <strong>
+                            Top-K Recommendation
+                        </strong>
+
+                        <p>
+                            Return the highest-ranked careers.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Main dashboard JavaScript -->
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+
+<!-- Milestone 2 JavaScript -->
+<script src="{{ url_for('static', filename='js/milestone2.js') }}"></script>
+
 </body>
 </html>
