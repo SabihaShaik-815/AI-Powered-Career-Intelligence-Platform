@@ -1,233 +1,1443 @@
-// ---------------------------------------------------------------------------
-// Tabs
-// ---------------------------------------------------------------------------
-document.querySelectorAll(".tab-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-        document.querySelectorAll(".tab-panel").forEach((p) => p.classList.remove("active"));
-        btn.classList.add("active");
-        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
-    });
-});
+/* =========================================================
+   CAREERCAST DASHBOARD JAVASCRIPT
+   ========================================================= */
 
-// ---------------------------------------------------------------------------
-// Upload: dropzone + file picker
-// ---------------------------------------------------------------------------
-const dropzone = document.getElementById("dropzone");
-const resumeFileInput = document.getElementById("resumeFile");
-const resumeTextArea = document.getElementById("resumeText");
+document.addEventListener("DOMContentLoaded", function () {
 
-let selectedFile = null;
+    console.log("CareerCast dashboard.js loaded");
 
-dropzone.addEventListener("click", () => resumeFileInput.click());
+    /* =====================================================
+       TAB SWITCHING
+       ===================================================== */
 
-resumeFileInput.addEventListener("change", () => {
-    if (resumeFileInput.files.length > 0) {
-        selectedFile = resumeFileInput.files[0];
-        dropzone.querySelector("p strong").textContent = `Selected: ${selectedFile.name}`;
-    }
-});
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
 
-["dragover", "dragenter"].forEach((evt) =>
-    dropzone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropzone.classList.add("dragover");
-    })
-);
-["dragleave", "drop"].forEach((evt) =>
-    dropzone.addEventListener(evt, (e) => {
-        e.preventDefault();
-        dropzone.classList.remove("dragover");
-    })
-);
-dropzone.addEventListener("drop", (e) => {
-    if (e.dataTransfer.files.length > 0) {
-        selectedFile = e.dataTransfer.files[0];
-        dropzone.querySelector("p strong").textContent = `Selected: ${selectedFile.name}`;
-    }
-});
+    function openTab(tabName) {
 
-// ---------------------------------------------------------------------------
-// Analyze
-// ---------------------------------------------------------------------------
-const analyzeBtn = document.getElementById("analyzeBtn");
-const analyzeStatus = document.getElementById("analyzeStatus");
+        console.log("Opening tab:", tabName);
 
-analyzeBtn.addEventListener("click", async () => {
-    const pastedText = resumeTextArea.value.trim();
-
-    if (!selectedFile && !pastedText) {
-        setStatus(analyzeStatus, "Please upload a file or paste resume text.", "error");
-        return;
-    }
-
-    setStatus(analyzeStatus, "Analyzing...", "");
-    analyzeBtn.disabled = true;
-
-    try {
-        let response;
-        if (selectedFile) {
-            const formData = new FormData();
-            formData.append("resume_file", selectedFile);
-            response = await fetch("/api/analyze", { method: "POST", body: formData });
-        } else {
-            response = await fetch("/api/analyze", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: pastedText }),
-            });
-        }
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            setStatus(analyzeStatus, data.error || "Something went wrong.", "error");
-            return;
-        }
-
-        renderResults(data);
-        setStatus(analyzeStatus, "Analysis complete — see the 'Parsing & Prediction' tab.", "success");
-
-        // Switch to results tab automatically
-        document.querySelector('[data-tab="results"]').click();
-    } catch (err) {
-        setStatus(analyzeStatus, "Network or server error: " + err.message, "error");
-    } finally {
-        analyzeBtn.disabled = false;
-    }
-});
-
-function setStatus(el, message, kind) {
-    el.textContent = message;
-    el.className = "status-msg" + (kind ? " " + kind : "");
-}
-
-// ---------------------------------------------------------------------------
-// Render results
-// ---------------------------------------------------------------------------
-function renderResults(data) {
-    document.getElementById("noResults").style.display = "none";
-    document.getElementById("resultsGrid").style.display = "grid";
-
-    document.getElementById("parsedText").innerHTML = data.highlighted_html;
-
-    const skillBadges = document.getElementById("skillBadges");
-    skillBadges.innerHTML = data.skills.length
-        ? data.skills.map((s) => `<span class="badge">${escapeHtml(s)}</span>`).join("")
-        : '<span class="muted">No skills detected from the gazetteer.</span>';
-
-    const eduList = document.getElementById("educationList");
-    eduList.innerHTML = data.education.length
-        ? data.education
-              .map((e) => `<li><strong>${escapeHtml(e.degree)}</strong>, ${escapeHtml(e.institution || "—")}</li>`)
-              .join("")
-        : '<li class="muted">No education entries detected.</li>';
-
-    // Prediction bars
-    const barsContainer = document.getElementById("predictionBars");
-    barsContainer.innerHTML = data.predictions
-        .map((p) => {
-            const pct = Math.max(2, Math.round(p.confidence * 100));
-            return `
-                <div class="bar-row">
-                    <div class="bar-label"><span>${escapeHtml(p.role)}</span><span>${pct}%</span></div>
-                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
-                </div>
-            `;
-        })
-        .join("");
-
-    if (data.top_role) {
-        document.getElementById("bestRole").textContent = data.top_role;
-        const topPred = data.predictions.find((p) => p.role === data.top_role);
-        document.getElementById("bestConf").textContent = topPred
-            ? `Confidence: ${Math.round(topPred.confidence * 100)}%`
-            : "";
-    }
-
-    // Skill gap
-    const skillGapCard = document.getElementById("skillGapCard");
-    if (data.skill_gap) {
-        skillGapCard.style.display = "block";
-        document.getElementById("skillGapRole").textContent = "— " + data.top_role;
-
-        const matchedEl = document.getElementById("matchedBadges");
-        matchedEl.innerHTML = data.skill_gap.matched.length
-            ? data.skill_gap.matched.map((s) => `<span class="badge">${escapeHtml(s)}</span>`).join("")
-            : '<span class="muted">No overlap with the required profile yet.</span>';
-
-        const missingEl = document.getElementById("missingBadges");
-        missingEl.innerHTML = data.skill_gap.missing.length
-            ? data.skill_gap.missing.map((s) => `<span class="badge-missing">${escapeHtml(s)}</span>`).join("")
-            : '<span class="muted">Fully covers the required profile</span>';
-    } else {
-        skillGapCard.style.display = "none";
-    }
-}
-
-function escapeHtml(str) {
-    const div = document.createElement("div");
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// ---------------------------------------------------------------------------
-// Profile form
-// ---------------------------------------------------------------------------
-const profileForm = document.getElementById("profileForm");
-const profileStatus = document.getElementById("profileStatus");
-
-// Load existing profile on page load
-(async function loadProfile() {
-    try {
-        const res = await fetch("/api/profile");
-        const data = await res.json();
-        if (data && data.name) {
-            document.getElementById("pf_name").value = data.name || "";
-            document.getElementById("pf_email").value = data.email || "";
-            document.getElementById("pf_years").value = data.years_experience || "";
-            document.getElementById("pf_education").value = data.education_level || "high school";
-            document.getElementById("pf_skills").value = (data.skills || []).join(", ");
-            document.getElementById("pf_current_role").value = data.current_role || "";
-            document.getElementById("pf_desired_role").value = data.desired_role || "";
-            document.getElementById("pf_location").value = data.location || "";
-        }
-    } catch (e) {
-        // no existing profile yet - fine
-    }
-})();
-
-profileForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const payload = {
-        name: document.getElementById("pf_name").value.trim(),
-        email: document.getElementById("pf_email").value.trim(),
-        years_experience: parseFloat(document.getElementById("pf_years").value || "0"),
-        education_level: document.getElementById("pf_education").value,
-        skills: document.getElementById("pf_skills").value
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean),
-        current_role: document.getElementById("pf_current_role").value.trim(),
-        desired_role: document.getElementById("pf_desired_role").value.trim(),
-        location: document.getElementById("pf_location").value.trim(),
-    };
-
-    try {
-        const res = await fetch("/api/profile", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+        tabButtons.forEach(function (button) {
+            button.classList.remove("active");
         });
-        const data = await res.json();
 
-        if (!res.ok) {
-            setStatus(profileStatus, (data.errors || ["Save failed."]).join(" "), "error");
+        tabPanels.forEach(function (panel) {
+            panel.classList.remove("active");
+        });
+
+        const selectedButton = document.querySelector(
+            '.tab-btn[data-tab="' + tabName + '"]'
+        );
+
+        if (selectedButton) {
+            selectedButton.classList.add("active");
+        }
+
+        const selectedPanel = document.getElementById(
+            "tab-" + tabName
+        );
+
+        if (selectedPanel) {
+            selectedPanel.classList.add("active");
+        }
+
+        /* Milestone 2 */
+        if (
+            tabName === "analytics" &&
+            typeof initializeMilestone2 === "function"
+        ) {
+            setTimeout(function () {
+                initializeMilestone2();
+            }, 100);
+        }
+    }
+
+    tabButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const tabName =
+                button.getAttribute("data-tab");
+
+            openTab(tabName);
+
+        });
+
+    });
+
+
+    /* =====================================================
+       RESUME UPLOAD / DROPZONE
+       ===================================================== */
+
+    const dropzone =
+        document.getElementById("dropzone");
+
+    const resumeFile =
+        document.getElementById("resumeFile");
+
+
+    if (dropzone && resumeFile) {
+
+        console.log("Upload system initialized");
+
+
+        /* Click dropzone */
+
+        dropzone.addEventListener(
+            "click",
+            function (event) {
+
+                /*
+                 * Prevent clicking the selected-file
+                 * text from opening the file picker again.
+                 */
+
+                if (
+                    event.target.closest(".selected-file")
+                ) {
+                    return;
+                }
+
+                resumeFile.click();
+
+            }
+        );
+
+
+        /* File selected */
+
+        resumeFile.addEventListener(
+            "change",
+            function () {
+
+                if (resumeFile.files.length > 0) {
+
+                    const file =
+                        resumeFile.files[0];
+
+                    console.log(
+                        "Selected file:",
+                        file.name
+                    );
+
+                    showFileName(file);
+                }
+
+            }
+        );
+
+
+        /* Drag over */
+
+        dropzone.addEventListener(
+            "dragover",
+            function (event) {
+
+                event.preventDefault();
+
+                dropzone.classList.add("dragover");
+
+            }
+        );
+
+
+        /* Drag leave */
+
+        dropzone.addEventListener(
+            "dragleave",
+            function () {
+
+                dropzone.classList.remove(
+                    "dragover"
+                );
+
+            }
+        );
+
+
+        /* Drop */
+
+        dropzone.addEventListener(
+            "drop",
+            function (event) {
+
+                event.preventDefault();
+
+                dropzone.classList.remove(
+                    "dragover"
+                );
+
+                const files =
+                    event.dataTransfer.files;
+
+                if (files.length > 0) {
+
+                    const file = files[0];
+
+                    console.log(
+                        "Dropped file:",
+                        file.name
+                    );
+
+                    try {
+
+                        const dataTransfer =
+                            new DataTransfer();
+
+                        dataTransfer.items.add(file);
+
+                        resumeFile.files =
+                            dataTransfer.files;
+
+                    }
+                    catch (error) {
+
+                        console.error(
+                            "Could not assign dropped file:",
+                            error
+                        );
+
+                    }
+
+                    showFileName(file);
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       SHOW SELECTED FILE
+       ===================================================== */
+
+    function showFileName(file) {
+
+        if (!dropzone) {
             return;
         }
-        setStatus(profileStatus, "Profile saved.", "success");
-    } catch (err) {
-        setStatus(profileStatus, "Network error: " + err.message, "error");
+
+        const oldMessage =
+            dropzone.querySelector(
+                ".selected-file"
+            );
+
+        if (oldMessage) {
+            oldMessage.remove();
+        }
+
+        const fileMessage =
+            document.createElement("p");
+
+        fileMessage.className =
+            "selected-file";
+
+        fileMessage.innerHTML =
+            "Selected: <strong>" +
+            escapeHtml(file.name) +
+            "</strong>";
+
+        dropzone.appendChild(
+            fileMessage
+        );
+
     }
+
+
+    /* =====================================================
+       ANALYZE BUTTON
+       ===================================================== */
+
+    const analyzeButton =
+        document.getElementById(
+            "analyzeBtn"
+        );
+
+
+    if (analyzeButton) {
+
+        analyzeButton.addEventListener(
+            "click",
+            function () {
+
+                analyzeResume();
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       ANALYZE RESUME
+       ===================================================== */
+
+    function analyzeResume() {
+
+        const fileInput =
+            document.getElementById(
+                "resumeFile"
+            );
+
+        const textInput =
+            document.getElementById(
+                "resumeText"
+            );
+
+        const status =
+            document.getElementById(
+                "analyzeStatus"
+            );
+
+
+        const file =
+            fileInput &&
+            fileInput.files.length > 0
+                ? fileInput.files[0]
+                : null;
+
+
+        const text =
+            textInput
+                ? textInput.value.trim()
+                : "";
+
+
+        /* Nothing entered */
+
+        if (!file && !text) {
+
+            setStatus(
+                status,
+                "Please upload a resume or paste resume text.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        setStatus(
+            status,
+            "Analyzing resume...",
+            ""
+        );
+
+
+        if (analyzeButton) {
+            analyzeButton.disabled = true;
+        }
+
+
+        /* =================================================
+           IMPORTANT FLASK CONNECTION
+
+           Flask route:
+
+           POST /api/analyze
+
+           Flask expects:
+
+           resume_file
+           text
+           ================================================= */
+
+
+        const formData =
+            new FormData();
+
+
+        if (file) {
+
+            formData.append(
+                "resume_file",
+                file
+            );
+
+        }
+
+
+        if (text) {
+
+            formData.append(
+                "text",
+                text
+            );
+
+        }
+
+
+        console.log(
+            "Sending resume to /api/analyze"
+        );
+
+
+        fetch(
+            "/api/analyze",
+            {
+                method: "POST",
+                body: formData
+            }
+        )
+
+        .then(function (response) {
+
+            console.log(
+                "API status:",
+                response.status
+            );
+
+
+            if (!response.ok) {
+
+                return response.json()
+                    .then(function (errorData) {
+
+                        throw new Error(
+                            errorData.error ||
+                            "Server returned " +
+                            response.status
+                        );
+
+                    })
+                    .catch(function () {
+
+                        throw new Error(
+                            "Server returned " +
+                            response.status
+                        );
+
+                    });
+
+            }
+
+
+            return response.json();
+
+        })
+
+
+        .then(function (data) {
+
+            console.log(
+                "Analysis response:",
+                data
+            );
+
+
+            displayResults(data);
+
+
+            setStatus(
+                status,
+                "Resume analyzed successfully.",
+                "success"
+            );
+
+
+            /* Open Results tab */
+
+            openTab("results");
+
+        })
+
+
+        .catch(function (error) {
+
+            console.error(
+                "Analysis error:",
+                error
+            );
+
+
+            setStatus(
+                status,
+                error.message ||
+                "Unable to analyze resume.",
+                "error"
+            );
+
+        })
+
+
+        .finally(function () {
+
+            if (analyzeButton) {
+                analyzeButton.disabled = false;
+            }
+
+        });
+
+    }
+
+
+    /* =====================================================
+       DISPLAY RESULTS
+       ===================================================== */
+
+    function displayResults(data) {
+
+        console.log(
+            "Displaying results:",
+            data
+        );
+
+
+        const noResults =
+            document.getElementById(
+                "noResults"
+            );
+
+
+        const resultsGrid =
+            document.getElementById(
+                "resultsGrid"
+            );
+
+
+        if (noResults) {
+
+            noResults.style.display =
+                "none";
+
+        }
+
+
+        if (resultsGrid) {
+
+            resultsGrid.style.display =
+                "grid";
+
+        }
+
+
+        /* =================================================
+           PARSED / HIGHLIGHTED TEXT
+           ================================================= */
+
+        const parsedText =
+            document.getElementById(
+                "parsedText"
+            );
+
+
+        if (parsedText) {
+
+            /*
+             * Flask returns highlighted_html.
+             * Use innerHTML so highlighted skills
+             * appear correctly.
+             */
+
+            if (data.highlighted_html) {
+
+                parsedText.innerHTML =
+                    data.highlighted_html;
+
+            }
+            else {
+
+                parsedText.textContent =
+                    "No parsed text available.";
+
+            }
+
+        }
+
+
+        /* =================================================
+           SKILLS
+           ================================================= */
+
+        const skillBadges =
+            document.getElementById(
+                "skillBadges"
+            );
+
+
+        if (skillBadges) {
+
+            skillBadges.innerHTML = "";
+
+
+            const skills =
+                data.skills || [];
+
+
+            if (skills.length === 0) {
+
+                skillBadges.innerHTML =
+                    "<span>No skills detected.</span>";
+
+            }
+
+
+            skills.forEach(function (skill) {
+
+                const badge =
+                    document.createElement(
+                        "span"
+                    );
+
+                badge.className =
+                    "badge";
+
+                badge.textContent =
+                    skill;
+
+                skillBadges.appendChild(
+                    badge
+                );
+
+            });
+
+        }
+
+
+        /* =================================================
+           EDUCATION
+           ================================================= */
+
+        const educationList =
+            document.getElementById(
+                "educationList"
+            );
+
+
+        if (educationList) {
+
+            educationList.innerHTML = "";
+
+
+            const education =
+                data.education || [];
+
+
+            if (education.length === 0) {
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+                li.textContent =
+                    "No education information detected.";
+
+                educationList.appendChild(
+                    li
+                );
+
+            }
+
+
+            education.forEach(
+                function (item) {
+
+                    const li =
+                        document.createElement(
+                            "li"
+                        );
+
+
+                    if (
+                        typeof item ===
+                        "object"
+                    ) {
+
+                        li.textContent =
+                            item.degree +
+                            (
+                                item.institution
+                                    ? " - " +
+                                      item.institution
+                                    : ""
+                            );
+
+                    }
+                    else {
+
+                        li.textContent =
+                            item;
+
+                    }
+
+
+                    educationList.appendChild(
+                        li
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           BEST ROLE
+           ================================================= */
+
+        const bestRole =
+            document.getElementById(
+                "bestRole"
+            );
+
+
+        if (bestRole) {
+
+            /*
+             * Flask returns top_role.
+             */
+
+            bestRole.textContent =
+                data.top_role ||
+                "Not available";
+
+        }
+
+
+        /* =================================================
+           BEST CONFIDENCE
+           ================================================= */
+
+        const bestConf =
+            document.getElementById(
+                "bestConf"
+            );
+
+
+        if (bestConf) {
+
+            let confidence = 0;
+
+
+            /*
+             * Flask returns predictions:
+             *
+             * [
+             *   {
+             *      role: "...",
+             *      confidence: 0.XX
+             *   }
+             * ]
+             */
+
+            if (
+                data.predictions &&
+                data.predictions.length > 0
+            ) {
+
+                confidence =
+                    Number(
+                        data.predictions[0]
+                            .confidence || 0
+                    );
+
+            }
+
+
+            if (confidence <= 1) {
+
+                confidence =
+                    confidence * 100;
+
+            }
+
+
+            bestConf.textContent =
+                confidence.toFixed(2) +
+                "% confidence";
+
+        }
+
+
+        /* =================================================
+           PREDICTION BARS
+           ================================================= */
+
+        displayPredictionBars(
+            data.predictions || []
+        );
+
+
+        /* =================================================
+           SKILL GAP
+           ================================================= */
+
+        displaySkillGap(data);
+
+    }
+
+
+    /* =====================================================
+       PREDICTION BARS
+       ===================================================== */
+
+    function displayPredictionBars(
+        predictions
+    ) {
+
+        const container =
+            document.getElementById(
+                "predictionBars"
+            );
+
+
+        if (!container) {
+            return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        if (
+            !Array.isArray(predictions) ||
+            predictions.length === 0
+        ) {
+
+            container.innerHTML =
+                "<p>No career predictions available.</p>";
+
+            return;
+
+        }
+
+
+        predictions.forEach(
+            function (prediction) {
+
+                const role =
+                    prediction.role ||
+                    "Career";
+
+
+                let confidence =
+                    Number(
+                        prediction.confidence || 0
+                    );
+
+
+                if (confidence <= 1) {
+
+                    confidence =
+                        confidence * 100;
+
+                }
+
+
+                /* Keep percentage between 0 and 100 */
+
+                confidence =
+                    Math.max(
+                        0,
+                        Math.min(
+                            100,
+                            confidence
+                        )
+                    );
+
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                row.className =
+                    "bar-row";
+
+
+                row.innerHTML =
+                    '<div class="bar-label">' +
+                        '<span>' +
+                            escapeHtml(role) +
+                        '</span>' +
+                        '<span>' +
+                            confidence.toFixed(1) +
+                            '%' +
+                        '</span>' +
+                    '</div>' +
+
+                    '<div class="bar-track">' +
+
+                        '<div ' +
+                        'class="bar-fill" ' +
+                        'style="width:' +
+                        confidence +
+                        '%">' +
+                        '</div>' +
+
+                    '</div>';
+
+
+                container.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       SKILL GAP
+       ===================================================== */
+
+    function displaySkillGap(data) {
+
+        const card =
+            document.getElementById(
+                "skillGapCard"
+            );
+
+
+        if (!card) {
+            return;
+        }
+
+
+        /*
+         * Flask returns:
+         *
+         * skill_gap: {
+         *    matched: [],
+         *    missing: []
+         * }
+         */
+
+        const gap =
+            data.skill_gap || {};
+
+
+        const matched =
+            gap.matched || [];
+
+
+        const missing =
+            gap.missing || [];
+
+
+        if (
+            matched.length === 0 &&
+            missing.length === 0
+        ) {
+
+            card.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        card.style.display =
+            "block";
+
+
+        /* =================================================
+           ROLE NAME
+           ================================================= */
+
+        const skillGapRole =
+            document.getElementById(
+                "skillGapRole"
+            );
+
+
+        if (skillGapRole) {
+
+            skillGapRole.textContent =
+                data.top_role
+                    ? " - " + data.top_role
+                    : "";
+
+        }
+
+
+        /* =================================================
+           MATCHED
+           ================================================= */
+
+        const matchedContainer =
+            document.getElementById(
+                "matchedBadges"
+            );
+
+
+        if (matchedContainer) {
+
+            matchedContainer.innerHTML =
+                "";
+
+
+            matched.forEach(
+                function (skill) {
+
+                    const badge =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    badge.className =
+                        "badge";
+
+
+                    badge.textContent =
+                        skill;
+
+
+                    matchedContainer.appendChild(
+                        badge
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           MISSING
+           ================================================= */
+
+        const missingContainer =
+            document.getElementById(
+                "missingBadges"
+            );
+
+
+        if (missingContainer) {
+
+            missingContainer.innerHTML =
+                "";
+
+
+            missing.forEach(
+                function (skill) {
+
+                    const badge =
+                        document.createElement(
+                            "span"
+                        );
+
+
+                    badge.className =
+                        "badge-missing";
+
+
+                    badge.textContent =
+                        skill;
+
+
+                    missingContainer.appendChild(
+                        badge
+                    );
+
+                }
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       PROFILE FORM
+       ===================================================== */
+
+    const profileForm =
+        document.getElementById(
+            "profileForm"
+        );
+
+
+    if (profileForm) {
+
+        profileForm.addEventListener(
+            "submit",
+            function (event) {
+
+                event.preventDefault();
+
+
+                const status =
+                    document.getElementById(
+                        "profileStatus"
+                    );
+
+
+                const skillsText =
+                    document.getElementById(
+                        "pf_skills"
+                    ).value;
+
+
+                const skills =
+                    skillsText
+                        .split(",")
+                        .map(function (skill) {
+
+                            return skill.trim();
+
+                        })
+                        .filter(function (skill) {
+
+                            return skill.length > 0;
+
+                        });
+
+
+                const profileData = {
+
+                    name:
+                        document.getElementById(
+                            "pf_name"
+                        ).value.trim(),
+
+                    email:
+                        document.getElementById(
+                            "pf_email"
+                        ).value.trim(),
+
+                    years_experience:
+                        document.getElementById(
+                            "pf_years"
+                        ).value,
+
+                    education_level:
+                        document.getElementById(
+                            "pf_education"
+                        ).value,
+
+                    skills:
+                        skills,
+
+                    current_role:
+                        document.getElementById(
+                            "pf_current_role"
+                        ).value.trim(),
+
+                    desired_role:
+                        document.getElementById(
+                            "pf_desired_role"
+                        ).value.trim(),
+
+                    location:
+                        document.getElementById(
+                            "pf_location"
+                        ).value.trim()
+
+                };
+
+
+                console.log(
+                    "Saving profile:",
+                    profileData
+                );
+
+
+                setStatus(
+                    status,
+                    "Saving profile...",
+                    ""
+                );
+
+
+                fetch(
+                    "/api/profile",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify(
+                                profileData
+                            )
+                    }
+                )
+
+
+                .then(function (response) {
+
+                    return response.json()
+                        .then(function (result) {
+
+                            if (!response.ok) {
+
+                                throw new Error(
+                                    result.errors
+                                        ? result.errors.join(", ")
+                                        : "Could not save profile."
+                                );
+
+                            }
+
+                            return result;
+
+                        });
+
+                })
+
+
+                .then(function (result) {
+
+                    console.log(
+                        "Profile saved:",
+                        result
+                    );
+
+
+                    setStatus(
+                        status,
+                        "Profile saved successfully.",
+                        "success"
+                    );
+
+                })
+
+
+                .catch(function (error) {
+
+                    console.error(
+                        "Profile error:",
+                        error
+                    );
+
+
+                    setStatus(
+                        status,
+                        error.message ||
+                        "Could not save profile.",
+                        "error"
+                    );
+
+                });
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       LOAD SAVED PROFILE
+       ===================================================== */
+
+    function loadProfile() {
+
+        fetch("/api/profile")
+
+            .then(function (response) {
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Could not load profile."
+                    );
+                }
+
+                return response.json();
+
+            })
+
+            .then(function (data) {
+
+                console.log(
+                    "Loaded profile:",
+                    data
+                );
+
+
+                if (!data || !data.name) {
+                    return;
+                }
+
+
+                const name =
+                    document.getElementById(
+                        "pf_name"
+                    );
+
+                const email =
+                    document.getElementById(
+                        "pf_email"
+                    );
+
+                const years =
+                    document.getElementById(
+                        "pf_years"
+                    );
+
+                const education =
+                    document.getElementById(
+                        "pf_education"
+                    );
+
+                const skills =
+                    document.getElementById(
+                        "pf_skills"
+                    );
+
+                const currentRole =
+                    document.getElementById(
+                        "pf_current_role"
+                    );
+
+                const desiredRole =
+                    document.getElementById(
+                        "pf_desired_role"
+                    );
+
+                const location =
+                    document.getElementById(
+                        "pf_location"
+                    );
+
+
+                if (name) {
+                    name.value =
+                        data.name || "";
+                }
+
+                if (email) {
+                    email.value =
+                        data.email || "";
+                }
+
+                if (years) {
+                    years.value =
+                        data.years_experience || "";
+                }
+
+                if (education) {
+                    education.value =
+                        data.education_level || "";
+                }
+
+                if (skills) {
+                    skills.value =
+                        Array.isArray(data.skills)
+                            ? data.skills.join(", ")
+                            : "";
+                }
+
+                if (currentRole) {
+                    currentRole.value =
+                        data.current_role || "";
+                }
+
+                if (desiredRole) {
+                    desiredRole.value =
+                        data.desired_role || "";
+                }
+
+                if (location) {
+                    location.value =
+                        data.location || "";
+                }
+
+            })
+
+            .catch(function (error) {
+
+                console.log(
+                    "Profile loading:",
+                    error.message
+                );
+
+            });
+
+    }
+
+
+    /* =====================================================
+       STATUS MESSAGE
+       ===================================================== */
+
+    function setStatus(
+        element,
+        message,
+        type
+    ) {
+
+        if (!element) {
+            return;
+        }
+
+
+        element.textContent =
+            message;
+
+
+        element.className =
+            "status-msg";
+
+
+        if (type) {
+
+            element.classList.add(
+                type
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       HTML ESCAPE
+       ===================================================== */
+
+    function escapeHtml(value) {
+
+        return String(value)
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =====================================================
+       OPEN UPLOAD TAB
+       ===================================================== */
+
+    openTab("upload");
+
+
+    /* =====================================================
+       LOAD PROFILE
+       ===================================================== */
+
+    loadProfile();
+
+
+    console.log(
+        "CareerCast dashboard initialized successfully."
+    );
+
 });
