@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Skill Gap Analysis - CareerCast</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1f2937;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 65px;
+            width: 100%;
+            background: #0f172a;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+
+            position: fixed;
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .user-name {
+            font-size: 15px;
+            color: #e5e7eb;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            top: 65px;
+            left: 0;
+
+            width: 240px;
+            height: calc(100vh - 65px);
+
+            background: white;
+
+            border-right: 1px solid #e5e7eb;
+
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+
+            padding: 14px 25px;
+
+            color: #4b5563;
+            text-decoration: none;
+
+            font-size: 15px;
+
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover {
+            background: #f3f4f6;
+            color: #2563eb;
+        }
+
+        .sidebar a.active {
+            background: #eff6ff;
+            color: #2563eb;
+
+            font-weight: bold;
+
+            border-right: 4px solid #2563eb;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 240px;
+            margin-top: 65px;
+
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        /* ================= CARD ================= */
+
+        .card {
+            background: white;
+
+            border-radius: 12px;
+
+            padding: 22px;
+
+            margin-bottom: 22px;
+
+            border: 1px solid #e5e7eb;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+        /* ================= TARGET ROLE ================= */
+
+        .target-role {
+            font-size: 24px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        /* ================= SKILL GRID ================= */
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .skill-box {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+
+            padding: 22px;
+
+            min-height: 250px;
+        }
+
+        .skill-box h3 {
+            margin-bottom: 18px;
+            font-size: 18px;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+
+            gap: 10px;
+
+            padding: 12px 5px;
+
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .skill-item:last-child {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #16a34a;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .cross {
+            color: #dc2626;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* ================= ALIGNMENT ================= */
+
+        .alignment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+        .alignment-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .progress-container {
+            height: 24px;
+
+            background: #e5e7eb;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+
+            background: #2563eb;
+
+            border-radius: 20px;
+
+            transition: width 1s ease;
+        }
+
+        /* ================= BOTTOM GRID ================= */
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+        }
+
+        /* ================= TABLE ================= */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            text-align: left;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .start-btn {
+            background: #2563eb;
+            color: white;
+
+            border: none;
+            border-radius: 6px;
+
+            padding: 8px 14px;
+
+            cursor: pointer;
+        }
+
+        .start-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* ================= TOP ROLES ================= */
+
+        .role-item {
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 15px 0;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .role-item:last-child {
+            border-bottom: none;
+        }
+
+        .match-badge {
+            background: #dcfce7;
+            color: #15803d;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* ================= MESSAGE ================= */
+
+        .message {
+            color: #6b7280;
+            padding: 15px 0;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .skills-grid,
+            .bottom-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <div class="navbar">
+
+        <div class="brand">
+            🚀 CareerCast
+        </div>
+
+        <div class="user-name">
+            Welcome, {{ user_name }}
+        </div>
+
+    </div>
+
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <a href="/dashboard">
+            🏠 &nbsp; Dashboard
+        </a>
+
+        <a href="/skill-gap" class="active">
+            📊 &nbsp; Skill Gap Analysis
+        </a>
+
+        <a href="#">
+            🗺 &nbsp; Career Roadmap
+        </a>
+
+        <a href="#">
+            📚 &nbsp; Learning Resources
+        </a>
+
+        <a href="#">
+            📄 &nbsp; Resume Analysis
+        </a>
+
+        <a href="#">
+            🎤 &nbsp; Mock Interview
+        </a>
+
+        <a href="/logout">
+            🚪 &nbsp; Logout
+        </a>
+
+    </div>
+
+
+    <!-- MAIN CONTENT -->
+
+    <div class="main">
+
+        <h1 class="page-title">
+            Skill Gap Analysis
+        </h1>
+
+        <p class="page-subtitle">
+            Identify your strengths, missing skills and recommended learning path.
+        </p>
+
+
+        <!-- TARGET ROLE -->
+
+        <div class="card">
+
+            <div class="card-title">
+                🎯 Your Target Career
+            </div>
+
+            <div id="targetRole" class="target-role">
+                Loading...
+            </div>
+
+        </div>
+
+
+        <!-- SKILLS -->
+
+        <div class="skills-grid">
+
+
+            <!-- YOUR SKILLS -->
+
+            <div class="skill-box">
+
+                <h3>
+                    ✅ Your Skills
+                </h3>
+
+                <div id="yourSkills">
+
+                    <div class="message">
+                        Loading skills...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MISSING SKILLS -->
+
+            <div class="skill-box">
+
+                <h3>
+                    ❌ Missing Skills
+                </h3>
+
+                <div id="missingSkills">
+
+                    <div class="message">
+                        Loading skills...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ALIGNMENT -->
+
+        <div class="card">
+
+            <div class="alignment-header">
+
+                <div class="card-title">
+                    📊 Skill Alignment
+                </div>
+
+                <div id="alignmentText" class="alignment-value">
+                    0%
+                </div>
+
+            </div>
+
+
+            <div class="progress-container">
+
+                <div
+                    id="progressBar"
+                    class="progress-bar"
+                ></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- BOTTOM -->
+
+        <div class="bottom-grid">
+
+
+            <!-- LEARNING PATH -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    📚 Recommended Learning Path
+                </div>
+
+
+                <div style="overflow-x:auto;">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>Skill</th>
+                                <th>Resource</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Level</th>
+                                <th>Action</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="learningPath">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- TOP JOB ROLES -->
+
+            <div class="card">
+
+                <div class="card-title">
+                    💼 Top Job Roles
+                </div>
+
+                <div id="topRoles">
+
+                    <div class="message">
+                        Loading roles...
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        async function loadSkillGap() {
+
+            try {
+
+                const response =
+                    await fetch("/api/skill-gap-results");
+
+
+                const data =
+                    await response.json();
+
+
+                /* NO ANALYSIS FOUND */
+
+                if (!response.ok || !data.success) {
+
+                    document
+                        .getElementById("targetRole")
+                        .innerHTML =
+                        `<div class="error-message">
+                            ${data.error ||
+                              "Please analyze your resume first from the Dashboard."}
+                        </div>`;
+
+
+                    document
+                        .getElementById("yourSkills")
+                        .innerHTML =
+                        `<div class="message">
+                            Go to Dashboard and analyze your resume first.
+                        </div>`;
+
+
+                    document
+                        .getElementById("missingSkills")
+                        .innerHTML =
+                        `<div class="message">
+                            No skill gap data available.
+                        </div>`;
+
+
+                    document
+                        .getElementById("learningPath")
+                        .innerHTML =
+                        `<tr>
+                            <td colspan="6">
+                                Analyze your resume first.
+                            </td>
+                        </tr>`;
+
+                    return;
+                }
+
+
+                /* TARGET ROLE */
+
+                document
+                    .getElementById("targetRole")
+                    .textContent =
+                    data.top_role;
+
+
+                /* YOUR SKILLS */
+
+                let yourSkillsHTML = "";
+
+                if (!data.your_skills || data.your_skills.length === 0) {
+
+                    yourSkillsHTML =
+                        `<div class="message">
+                            No matching skills found.
+                        </div>`;
+
+                } else {
+
+                    data.your_skills.forEach(function(skill) {
+
+                        yourSkillsHTML +=
+                            `<div class="skill-item">
+                                <span class="check">✓</span>
+                                <span>${skill}</span>
+                            </div>`;
+
+                    });
+
+                }
+
+
+                document
+                    .getElementById("yourSkills")
+                    .innerHTML =
+                    yourSkillsHTML;
+
+
+                /* MISSING SKILLS */
+
+                let missingSkillsHTML = "";
+
+                if (!data.missing_skills || data.missing_skills.length === 0) {
+
+                    missingSkillsHTML =
+                        `<div class="message">
+                            Excellent! You have all required skills.
+                        </div>`;
+
+                } else {
+
+                    data.missing_skills.forEach(function(skill) {
+
+                        missingSkillsHTML +=
+                            `<div class="skill-item">
+                                <span class="cross">✕</span>
+                                <span>${skill}</span>
+                            </div>`;
+
+                    });
+
+                }
+
+
+                document
+                    .getElementById("missingSkills")
+                    .innerHTML =
+                    missingSkillsHTML;
+
+
+                /* SKILL ALIGNMENT */
+
+                const alignment =
+                    Math.round(Number(data.alignment || 0));
+
+
+                document
+                    .getElementById("alignmentText")
+                    .textContent =
+                    alignment + "%";
+
+
+                setTimeout(function() {
+
+                    document
+                        .getElementById("progressBar")
+                        .style.width =
+                        alignment + "%";
+
+                }, 100);
+
+
+                /* LEARNING PATH */
+
+                let learningHTML = "";
+
+                if (!data.learning_path || data.learning_path.length === 0) {
+
+                    learningHTML =
+                        `<tr>
+                            <td colspan="6">
+                                Great! No learning gaps found.
+                            </td>
+                        </tr>`;
+
+                } else {
+
+                    data.learning_path.forEach(function(item) {
+
+                        learningHTML +=
+                            `<tr>
+
+                                <td>${item.skill}</td>
+
+                                <td>${item.resource}</td>
+
+                                <td>${item.type}</td>
+
+                                <td>${item.duration}</td>
+
+                                <td>${item.level}</td>
+
+                                <td>
+                                    <button
+                                        class="start-btn"
+                                        onclick="startLearning('${item.skill}')"
+                                    >
+                                        Start
+                                    </button>
+                                </td>
+
+                            </tr>`;
+
+                    });
+
+                }
+
+
+                document
+                    .getElementById("learningPath")
+                    .innerHTML =
+                    learningHTML;
+
+
+                /* TOP JOB ROLES */
+
+                let rolesHTML = "";
+
+                if (!data.predictions || data.predictions.length === 0) {
+
+                    rolesHTML =
+                        `<div class="message">
+                            No career predictions available.
+                        </div>`;
+
+                } else {
+
+                    data.predictions.forEach(function(item, index) {
+
+                        let confidence =
+                            Math.round(
+                                Number(item.confidence || 0) * 100
+                            );
+
+
+                        rolesHTML +=
+                            `<div class="role-item">
+
+                                <span>
+                                    ${index + 1}. ${item.role}
+                                </span>
+
+                                <span class="match-badge">
+                                    Match: ${confidence}%
+                                </span>
+
+                            </div>`;
+
+                    });
+
+                }
+
+
+                document
+                    .getElementById("topRoles")
+                    .innerHTML =
+                    rolesHTML;
+
+
+            } catch (error) {
+
+                console.error(
+                    "Skill Gap Error:",
+                    error
+                );
+
+
+                document
+                    .getElementById("targetRole")
+                    .innerHTML =
+                    `<div class="error-message">
+                        Error loading Skill Gap Analysis.
+                        Check your Flask server.
+                    </div>`;
+
+            }
+
+        }
+
+
+        function startLearning(skill) {
+
+            alert(
+                "Start learning " + skill +
+                ". You can add course links later."
+            );
+
+        }
+
+
+        loadSkillGap();
+
+    </script>
+
+</body>
+
+</html>

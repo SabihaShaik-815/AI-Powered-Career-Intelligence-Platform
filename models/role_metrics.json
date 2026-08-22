@@ -1,5 +1,5 @@
 {
-  "accuracy": 0.9838082901554405,
+  "accuracy": 0.9841321243523317,
   "classification_report": {
     "Accountant": {
       "precision": 1.0,
@@ -32,15 +32,15 @@
       "support": 151.0
     },
     "Data Analyst": {
-      "precision": 0.9620253164556962,
+      "precision": 0.9743589743589743,
       "recall": 0.9382716049382716,
-      "f1-score": 0.95,
+      "f1-score": 0.9559748427672956,
       "support": 81.0
     },
     "Data Scientist": {
-      "precision": 0.9795918367346939,
+      "precision": 0.96,
       "recall": 0.9795918367346939,
-      "f1-score": 0.9795918367346939,
+      "f1-score": 0.9696969696969697,
       "support": 49.0
     },
     "DevOps Engineer": {
@@ -74,15 +74,15 @@
       "support": 77.0
     },
     "Product Manager": {
-      "precision": 0.9519230769230769,
+      "precision": 0.9611650485436893,
       "recall": 0.9705882352941176,
-      "f1-score": 0.9611650485436893,
+      "f1-score": 0.9658536585365853,
       "support": 102.0
     },
     "Project Manager": {
-      "precision": 0.995049504950495,
-      "recall": 0.9925925925925926,
-      "f1-score": 0.9938195302843016,
+      "precision": 0.9950617283950617,
+      "recall": 0.9950617283950617,
+      "f1-score": 0.9950617283950617,
       "support": 405.0
     },
     "Registered Nurse": {
@@ -103,17 +103,17 @@
       "f1-score": 0.9666666666666667,
       "support": 296.0
     },
-    "accuracy": 0.9838082901554405,
+    "accuracy": 0.9841321243523317,
     "macro avg": {
-      "precision": 0.9647936057695837,
-      "recall": 0.945025294840233,
-      "f1-score": 0.9537491417227286,
+      "precision": 0.964911018489217,
+      "recall": 0.9451705381227313,
+      "f1-score": 0.9538674231246832,
       "support": 3088.0
     },
     "weighted avg": {
-      "precision": 0.9837270551748347,
-      "recall": 0.9838082901554405,
-      "f1-score": 0.9835725397755359,
+      "precision": 0.9840465687404168,
+      "recall": 0.9841321243523317,
+      "f1-score": 0.9838900404987987,
       "support": 3088.0
     }
   }
