@@ -2,3 +2,7 @@ data/postings.csv
 careercast.db
 __pycache__/
 *.pyc
+venv/
+mlflow.db
+.env
+uploads/
