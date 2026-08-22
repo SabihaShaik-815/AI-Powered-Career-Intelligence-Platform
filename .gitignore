@@ -6,3 +6,5 @@ venv/
 mlflow.db
 .env
 uploads/
+
+advanced_models/*.pkl
