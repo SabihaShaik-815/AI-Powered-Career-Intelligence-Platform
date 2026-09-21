@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,20 +7,202 @@
 
     <title>CareerCast - Dashboard</title>
 
-    <!-- Main CSS -->
+    <!-- =====================================================
+         MAIN STYLES
+         ===================================================== -->
+
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
-    <!-- Milestone 2 CSS -->
+    <!-- Milestone 2 -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/milestone2.css') }}">
 
-    <!-- Skill Gap CSS -->
+    <!-- Skill Gap -->
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/skillgap.css') }}">
 
+    <!-- Milestone 4 -->
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/milestone4.css') }}">
+
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <style id="milestone4-dashboard-overrides">
+        /* =========================================================
+           MILESTONE 4 DASHBOARD OVERRIDES
+           Keep M1-M3 untouched; fix M4 only.
+           ========================================================= */
+        .milestone4-page .m4-static-cohort-value {
+            color: #e8eefc !important;
+            font-weight: 700;
+        }
+
+        .milestone4-page .m4-career-comparison-card {
+            background: rgba(15, 23, 42, 0.78) !important;
+            color: #e8eefc !important;
+            border: 1px solid rgba(120, 150, 255, 0.14) !important;
+            margin-bottom: 24px !important;
+            overflow: hidden;
+        }
+
+        .milestone4-page .m4-comparison-result {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1fr) !important;
+            align-items: stretch !important;
+            gap: 18px !important;
+            margin-top: 22px !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+            background: transparent !important;
+        }
+
+        .milestone4-page .m4-comparison-card {
+            background: linear-gradient(145deg, rgba(21, 32, 58, 0.96), rgba(12, 20, 38, 0.96)) !important;
+            color: #e8eefc !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 16px !important;
+            padding: 22px !important;
+            min-height: 260px !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+        }
+
+        .milestone4-page .m4-comparison-card h4,
+        .milestone4-page .m4-comparison-card h5,
+        .milestone4-page .m4-comparison-card p,
+        .milestone4-page .m4-comparison-card span,
+        .milestone4-page .m4-comparison-card strong {
+            color: #e8eefc !important;
+        }
+
+        .milestone4-page .m4-comparison-vs {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            color: #9fb4ff !important;
+            min-height: 100% !important;
+            background: transparent !important;
+        }
+
+        .milestone4-page .m4-vs-circle {
+            width: 54px !important;
+            height: 54px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            background: rgba(88, 110, 255, 0.16) !important;
+            border: 1px solid rgba(120, 150, 255, 0.28) !important;
+            color: #b8c7ff !important;
+            font-weight: 800 !important;
+        }
+
+        .milestone4-page .m4-career-controls {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto !important;
+            gap: 16px !important;
+            align-items: end !important;
+            margin-top: 18px !important;
+        }
+
+        .milestone4-page .m4-career-controls select {
+            width: 100% !important;
+            background: #111a30 !important;
+            color: #e8eefc !important;
+            border: 1px solid rgba(255,255,255,.12) !important;
+        }
+
+        .milestone4-page .m4-comparison-score,
+        .milestone4-page .m4-comparison-metric {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            margin-top: 16px !important;
+            color: #aebbd8 !important;
+        }
+
+        .milestone4-page .m4-comparison-score strong,
+        .milestone4-page .m4-comparison-metric strong {
+            color: #8fb0ff !important;
+            font-size: 1.15rem !important;
+        }
+
+        .milestone4-page .m4-alignment-track {
+            height: 8px !important;
+            margin-top: 9px !important;
+            border-radius: 99px !important;
+            background: rgba(255,255,255,.08) !important;
+            overflow: hidden !important;
+        }
+
+        .milestone4-page .m4-alignment-fill {
+            height: 100% !important;
+            border-radius: inherit !important;
+            background: linear-gradient(90deg, #5274ff, #78ddb0) !important;
+        }
+
+        .milestone4-page .m4-skill-list {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 8px !important;
+            margin-top: 10px !important;
+        }
+
+        .milestone4-page .m4-skill-list span {
+            display: inline-flex !important;
+            padding: 6px 10px !important;
+            border-radius: 999px !important;
+            background: rgba(82, 116, 255, .12) !important;
+            border: 1px solid rgba(120, 150, 255, .18) !important;
+            color: #cbd7ff !important;
+            font-size: .82rem !important;
+        }
+
+        .milestone4-page .m4-comparison-summary {
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            gap: 12px !important;
+            margin-top: 18px !important;
+        }
+
+        .milestone4-page .m4-summary-item {
+            padding: 14px 16px !important;
+            border-radius: 12px !important;
+            background: rgba(255,255,255,.035) !important;
+            border: 1px solid rgba(255,255,255,.06) !important;
+        }
+
+        .milestone4-page .m4-summary-item span {
+            display: block !important;
+            color: #91a0bd !important;
+            font-size: .78rem !important;
+        }
+
+        .milestone4-page .m4-summary-item strong {
+            display: block !important;
+            margin-top: 5px !important;
+            color: #e8eefc !important;
+        }
+
+        @media (max-width: 900px) {
+            .milestone4-page .m4-comparison-result {
+                grid-template-columns: 1fr !important;
+            }
+
+            .milestone4-page .m4-comparison-vs {
+                min-height: 70px !important;
+            }
+
+            .milestone4-page .m4-career-controls,
+            .milestone4-page .m4-comparison-summary {
+                grid-template-columns: 1fr !important;
+            }
+        }
+    </style>
 
 </head>
 
@@ -128,6 +309,12 @@
             Skill Gap Analysis
         </button>
 
+        <button type="button"
+                class="tab-btn"
+                data-tab="milestone4">
+            Milestone 4
+        </button>
+
     </nav>
 
 
@@ -179,7 +366,6 @@
 
             </div>
 
-
             <div id="selectedFile"
                  class="selected-file"
                  style="display:none;">
@@ -200,11 +386,9 @@
 
             </div>
 
-
             <div class="or-divider">
                 OR
             </div>
-
 
             <label for="resumeText">
                 Paste Resume Text
@@ -215,13 +399,11 @@
                 rows="10"
                 placeholder="Paste your resume text here..."></textarea>
 
-
             <button type="button"
                     id="analyzeBtn"
                     class="btn-primary">
                 Analyze Resume
             </button>
-
 
             <div id="analyzeStatus"
                  class="status-msg">
@@ -252,7 +434,6 @@
             </p>
 
         </div>
-
 
         <div id="resultsGrid"
              class="results-grid"
@@ -335,7 +516,7 @@
         </div>
 
 
-        <!-- EXISTING SKILL GAP -->
+        <!-- SKILL GAP -->
 
         <div id="skillGapCard"
              class="card skill-gap-card"
@@ -386,27 +567,29 @@
                 <div class="form-row">
 
                     <div>
+
                         <label for="pf_name">
                             Full Name
                         </label>
 
-                        <input
-                            type="text"
-                            name="name"
-                            id="pf_name"
-                            required>
+                        <input type="text"
+                               name="name"
+                               id="pf_name"
+                               required>
+
                     </div>
 
                     <div>
+
                         <label for="pf_email">
                             Email
                         </label>
 
-                        <input
-                            type="email"
-                            name="email"
-                            id="pf_email"
-                            required>
+                        <input type="email"
+                               name="email"
+                               id="pf_email"
+                               required>
+
                     </div>
 
                 </div>
@@ -415,28 +598,29 @@
                 <div class="form-row">
 
                     <div>
+
                         <label for="pf_years">
                             Years of Experience
                         </label>
 
-                        <input
-                            type="number"
-                            name="years_experience"
-                            id="pf_years"
-                            min="0"
-                            max="60"
-                            step="0.5"
-                            required>
+                        <input type="number"
+                               name="years_experience"
+                               id="pf_years"
+                               min="0"
+                               max="60"
+                               step="0.5"
+                               required>
+
                     </div>
 
                     <div>
+
                         <label for="pf_education">
                             Highest Education
                         </label>
 
-                        <select
-                            name="education_level"
-                            id="pf_education">
+                        <select name="education_level"
+                                id="pf_education">
 
                             <option value="high school">
                                 High School
@@ -472,27 +656,29 @@
                 <div class="form-row">
 
                     <div>
+
                         <label for="pf_skills">
                             Skills
                         </label>
 
-                        <input
-                            type="text"
-                            name="skills"
-                            id="pf_skills"
-                            placeholder="Python, SQL, Machine Learning"
-                            required>
+                        <input type="text"
+                               name="skills"
+                               id="pf_skills"
+                               placeholder="Python, SQL, Machine Learning"
+                               required>
+
                     </div>
 
                     <div>
+
                         <label for="pf_current_role">
                             Current Role
                         </label>
 
-                        <input
-                            type="text"
-                            name="current_role"
-                            id="pf_current_role">
+                        <input type="text"
+                               name="current_role"
+                               id="pf_current_role">
+
                     </div>
 
                 </div>
@@ -501,25 +687,27 @@
                 <div class="form-row">
 
                     <div>
+
                         <label for="pf_desired_role">
                             Desired Role
                         </label>
 
-                        <input
-                            type="text"
-                            name="desired_role"
-                            id="pf_desired_role">
+                        <input type="text"
+                               name="desired_role"
+                               id="pf_desired_role">
+
                     </div>
 
                     <div>
+
                         <label for="pf_location">
                             Location
                         </label>
 
-                        <input
-                            type="text"
-                            name="location"
-                            id="pf_location">
+                        <input type="text"
+                               name="location"
+                               id="pf_location">
+
                     </div>
 
                 </div>
@@ -580,6 +768,7 @@
             <div class="analytics-stats">
 
                 <div class="analytics-stat-card">
+
                     <span class="stat-title">
                         Best Model
                     </span>
@@ -591,10 +780,12 @@
                     <small>
                         Advanced classifier
                     </small>
+
                 </div>
 
 
                 <div class="analytics-stat-card">
+
                     <span class="stat-title">
                         Best Accuracy
                     </span>
@@ -606,10 +797,12 @@
                     <small>
                         Test accuracy
                     </small>
+
                 </div>
 
 
                 <div class="analytics-stat-card">
+
                     <span class="stat-title">
                         Top Career
                     </span>
@@ -621,10 +814,12 @@
                     <small>
                         Highest confidence
                     </small>
+
                 </div>
 
 
                 <div class="analytics-stat-card">
+
                     <span class="stat-title">
                         Skill Alignment
                     </span>
@@ -636,6 +831,7 @@
                     <small>
                         Overall skill match
                     </small>
+
                 </div>
 
             </div>
@@ -711,8 +907,8 @@
                             </strong>
 
                             <p class="muted">
-                                Match between candidate
-                                skills and recommended careers.
+                                Match between candidate skills
+                                and recommended careers.
                             </p>
 
                         </div>
@@ -728,72 +924,6 @@
 
             <div class="card analytics-card">
 
-                <div class="analytics-card-header">
-
-                    <div>
-
-                        <h3>
-                            Skill Embedding Visualization
-                        </h3>
-
-                        <p class="muted">
-                            Semantic skill representation
-                            using Sentence-BERT.
-                        </p>
-
-                    </div>
-
-                    <span class="sbert-badge">
-                        SBERT
-                    </span>
-
-                </div>
-
-
-                <div class="embedding-container">
-
-                    <div class="embedding-chart"
-                         style="height:350px;">
-
-                        <canvas id="skillEmbeddingChart"></canvas>
-
-                    </div>
-
-                    <div class="embedding-legend">
-
-                        <h4>
-                            Career Categories
-                        </h4>
-
-                        <p>
-                            Software Engineering
-                        </p>
-
-                        <p>
-                            Data Science
-                        </p>
-
-                        <p>
-                            AI / ML
-                        </p>
-
-                        <p>
-                            Research
-                        </p>
-
-                        <p>
-                            Finance
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="card analytics-card">
-
                 <h3>
                     Milestone 2 Implementation
                 </h3>
@@ -801,7 +931,10 @@
                 <div class="milestone-features">
 
                     <div class="feature-box">
-                        <span>01</span>
+
+                        <span>
+                            01
+                        </span>
 
                         <h4>
                             Random Forest
@@ -811,11 +944,15 @@
                             Ensemble classification using
                             multiple decision trees.
                         </p>
+
                     </div>
 
 
                     <div class="feature-box">
-                        <span>02</span>
+
+                        <span>
+                            02
+                        </span>
 
                         <h4>
                             XGBoost
@@ -825,11 +962,15 @@
                             Gradient boosting for advanced
                             career classification.
                         </p>
+
                     </div>
 
 
                     <div class="feature-box">
-                        <span>03</span>
+
+                        <span>
+                            03
+                        </span>
 
                         <h4>
                             Sentence-BERT
@@ -839,11 +980,15 @@
                             Semantic representation of
                             skills and job descriptions.
                         </p>
+
                     </div>
 
 
                     <div class="feature-box">
-                        <span>04</span>
+
+                        <span>
+                            04
+                        </span>
 
                         <h4>
                             Top-K Ranking
@@ -853,100 +998,7 @@
                             Ranks suitable career options
                             using confidence and skill alignment.
                         </p>
-                    </div>
 
-                </div>
-
-            </div>
-
-
-            <div class="analytics-two-column">
-
-                <div class="card analytics-card">
-
-                    <h3>
-                        Prediction Confidence
-                    </h3>
-
-                    <p class="muted">
-                        Confidence scores of recommended careers.
-                    </p>
-
-                    <div id="confidenceList">
-
-                        <p class="muted">
-                            Analyze a resume to see confidence.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card analytics-card">
-
-                    <h3>
-                        Recommendation Method
-                    </h3>
-
-                    <div class="method-step">
-                        <span>1</span>
-
-                        <div>
-                            <strong>
-                                Resume Processing
-                            </strong>
-
-                            <p>
-                                Extract skills and education.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <div class="method-step">
-                        <span>2</span>
-
-                        <div>
-                            <strong>
-                                ML Classification
-                            </strong>
-
-                            <p>
-                                Predict suitable career classes.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <div class="method-step">
-                        <span>3</span>
-
-                        <div>
-                            <strong>
-                                Skill Alignment
-                            </strong>
-
-                            <p>
-                                Compare candidate skills
-                                with career requirements.
-                            </p>
-                        </div>
-                    </div>
-
-
-                    <div class="method-step">
-                        <span>4</span>
-
-                        <div>
-                            <strong>
-                                Top-K Recommendation
-                            </strong>
-
-                            <p>
-                                Return highest-ranked careers.
-                            </p>
-                        </div>
                     </div>
 
                 </div>
@@ -982,8 +1034,7 @@
 
                     <p>
                         API integration, prediction services,
-                        recommendation services and deployment
-                        monitoring.
+                        recommendation services and deployment.
                     </p>
 
                 </div>
@@ -1075,8 +1126,7 @@
                 </h3>
 
                 <p class="muted">
-                    Check whether the Milestone 3 backend
-                    service is running.
+                    Check whether the backend service is running.
                 </p>
 
                 <div style="
@@ -1125,14 +1175,11 @@
                         Career Prediction API
                     </h3>
 
-                    <p class="muted">
-                        Processes resume information and
-                        predicts the most suitable career.
-                    </p>
-
                     <div class="method-step">
 
-                        <span>1</span>
+                        <span>
+                            1
+                        </span>
 
                         <div>
 
@@ -1151,7 +1198,9 @@
 
                     <div class="method-step">
 
-                        <span>2</span>
+                        <span>
+                            2
+                        </span>
 
                         <div>
 
@@ -1171,7 +1220,9 @@
 
                     <div class="method-step">
 
-                        <span>3</span>
+                        <span>
+                            3
+                        </span>
 
                         <div>
 
@@ -1180,8 +1231,7 @@
                             </strong>
 
                             <p>
-                                Classifier predicts suitable
-                                career categories.
+                                Classifier predicts suitable careers.
                             </p>
 
                         </div>
@@ -1197,15 +1247,11 @@
                         Career Recommendation API
                     </h3>
 
-                    <p class="muted">
-                        Generates ranked career recommendations
-                        using prediction confidence and skill
-                        alignment.
-                    </p>
-
                     <div class="method-step">
 
-                        <span>1</span>
+                        <span>
+                            1
+                        </span>
 
                         <div>
 
@@ -1224,7 +1270,9 @@
 
                     <div class="method-step">
 
-                        <span>2</span>
+                        <span>
+                            2
+                        </span>
 
                         <div>
 
@@ -1233,7 +1281,7 @@
                             </strong>
 
                             <p>
-                                Select the highest-ranked careers.
+                                Select highest-ranked careers.
                             </p>
 
                         </div>
@@ -1243,7 +1291,9 @@
 
                     <div class="method-step">
 
-                        <span>3</span>
+                        <span>
+                            3
+                        </span>
 
                         <div>
 
@@ -1252,92 +1302,10 @@
                             </strong>
 
                             <p>
-                                Display confidence for each
-                                recommendation.
+                                Display confidence for recommendations.
                             </p>
 
                         </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="card analytics-card">
-
-                <h3>
-                    Deployment &amp; Integration
-                </h3>
-
-                <p class="muted">
-                    Milestone 3 connects the machine learning
-                    models with the CareerCast application.
-                </p>
-
-                <div class="milestone-features">
-
-                    <div class="feature-box">
-
-                        <span>01</span>
-
-                        <h4>
-                            Flask Backend
-                        </h4>
-
-                        <p>
-                            Provides application routes and
-                            REST API endpoints.
-                        </p>
-
-                    </div>
-
-
-                    <div class="feature-box">
-
-                        <span>02</span>
-
-                        <h4>
-                            ML Integration
-                        </h4>
-
-                        <p>
-                            Connects trained machine learning
-                            models with resume analysis.
-                        </p>
-
-                    </div>
-
-
-                    <div class="feature-box">
-
-                        <span>03</span>
-
-                        <h4>
-                            REST API
-                        </h4>
-
-                        <p>
-                            Provides prediction and
-                            recommendation services.
-                        </p>
-
-                    </div>
-
-
-                    <div class="feature-box">
-
-                        <span>04</span>
-
-                        <h4>
-                            Deployment
-                        </h4>
-
-                        <p>
-                            Makes the CareerCast platform
-                            accessible as an integrated application.
-                        </p>
 
                     </div>
 
@@ -1354,7 +1322,9 @@
 
                 <div class="method-step">
 
-                    <span>1</span>
+                    <span>
+                        1
+                    </span>
 
                     <div>
 
@@ -1363,8 +1333,7 @@
                         </strong>
 
                         <p>
-                            User uploads a resume through
-                            the CareerCast dashboard.
+                            User uploads a resume.
                         </p>
 
                     </div>
@@ -1374,7 +1343,9 @@
 
                 <div class="method-step">
 
-                    <span>2</span>
+                    <span>
+                        2
+                    </span>
 
                     <div>
 
@@ -1383,8 +1354,7 @@
                         </strong>
 
                         <p>
-                            Backend extracts skills,
-                            education and experience.
+                            Extract skills, education and experience.
                         </p>
 
                     </div>
@@ -1394,7 +1364,9 @@
 
                 <div class="method-step">
 
-                    <span>3</span>
+                    <span>
+                        3
+                    </span>
 
                     <div>
 
@@ -1403,8 +1375,7 @@
                         </strong>
 
                         <p>
-                            Machine learning models predict
-                            suitable career classes.
+                            ML models predict suitable careers.
                         </p>
 
                     </div>
@@ -1414,7 +1385,9 @@
 
                 <div class="method-step">
 
-                    <span>4</span>
+                    <span>
+                        4
+                    </span>
 
                     <div>
 
@@ -1423,29 +1396,7 @@
                         </strong>
 
                         <p>
-                            Top-K careers and confidence
-                            scores are generated.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="method-step">
-
-                    <span>5</span>
-
-                    <div>
-
-                        <strong>
-                            Dashboard Display
-                        </strong>
-
-                        <p>
-                            Predictions, confidence,
-                            skill alignment and API status
-                            are displayed to the user.
+                            Top-K careers and confidence scores.
                         </p>
 
                     </div>
@@ -1460,11 +1411,6 @@
                 <h3>
                     API Response
                 </h3>
-
-                <p class="muted">
-                    Latest response received from the
-                    Milestone 3 API.
-                </p>
 
                 <pre id="apiResponseBox"
                      style="
@@ -1492,9 +1438,6 @@
 
         <div class="analytics-page skill-gap-page">
 
-
-            <!-- HEADER -->
-
             <div class="analytics-header">
 
                 <div>
@@ -1509,7 +1452,7 @@
 
                     <p>
                         Identify your strengths, missing skills
-                        and a recommended learning path.
+                        and recommended learning path.
                     </p>
 
                 </div>
@@ -1521,8 +1464,6 @@
             </div>
 
 
-            <!-- EMPTY STATE -->
-
             <div id="sgEmptyState"
                  class="empty-state">
 
@@ -1532,24 +1473,15 @@
 
                 <p>
                     Analyze a resume in the Upload tab first.
-                    Your skill gap results will appear here.
                 </p>
 
             </div>
 
 
-            <!-- SKILL GAP CONTENT -->
-
             <div id="sgContent"
                  style="display:none;">
 
-
-                <!-- =================================================
-                     STATISTICS
-                     ================================================= -->
-
                 <div class="analytics-stats">
-
 
                     <div class="analytics-stat-card">
 
@@ -1560,10 +1492,6 @@
                         <strong id="sgTargetRole">
                             --
                         </strong>
-
-                        <small>
-                            Predicted career
-                        </small>
 
                     </div>
 
@@ -1578,10 +1506,6 @@
                             0%
                         </strong>
 
-                        <small>
-                            Overall skill match
-                        </small>
-
                     </div>
 
 
@@ -1594,10 +1518,6 @@
                         <strong id="sgMatchedCount">
                             0
                         </strong>
-
-                        <small>
-                            Skills already available
-                        </small>
 
                     </div>
 
@@ -1612,30 +1532,16 @@
                             0
                         </strong>
 
-                        <small>
-                            Important skill gaps
-                        </small>
-
                     </div>
 
                 </div>
 
-
-                <!-- =================================================
-                     PROGRESS
-                     ================================================= -->
 
                 <div class="card analytics-card">
 
                     <h3>
                         Skill Alignment Progress
                     </h3>
-
-                    <p class="muted">
-                        Your current match with the skills
-                        required for the predicted career.
-                    </p>
-
 
                     <div class="sg-progress-wrapper">
 
@@ -1648,14 +1554,7 @@
                 </div>
 
 
-                <!-- =================================================
-                     MATCHED / MISSING
-                     ================================================= -->
-
                 <div class="analytics-two-column">
-
-
-                    <!-- MATCHED -->
 
                     <div class="card analytics-card">
 
@@ -1663,21 +1562,12 @@
                             Matched Skills
                         </h3>
 
-                        <p class="muted">
-                            Skills found in your resume that
-                            match your target career.
-                        </p>
-
-
                         <div id="sgMatchedSkills"
                              class="sg-badge-container">
-
                         </div>
 
                     </div>
 
-
-                    <!-- MISSING -->
 
                     <div class="card analytics-card">
 
@@ -1685,14 +1575,992 @@
                             Skills You Need to Learn
                         </h3>
 
-                        <p class="muted">
-                            Important skills currently missing
-                            from your profile.
-                        </p>
-
-
                         <div id="sgMissingSkills"
                              class="sg-badge-container">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card analytics-card">
+
+                    <h3>
+                        Required Skills for Your Target Career
+                    </h3>
+
+                    <div id="sgRequiredSkills"
+                         class="sg-badge-container">
+                    </div>
+
+                </div>
+
+
+                <div class="card analytics-card">
+
+                    <h3>
+                        Recommended Learning Path
+                    </h3>
+
+                    <div id="sgLearningPath"
+                         class="sg-learning-path">
+                    </div>
+
+                </div>
+
+
+                <div class="card analytics-card">
+
+                    <h3>
+                        Top Predicted Job Roles
+                    </h3>
+
+                    <div id="sgTopRoles">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         TAB 7 : MILESTONE 4
+         PACKAGING, TESTING & FINALIZATION
+         ===================================================== -->
+
+    <section class="tab-panel"
+             id="tab-milestone4">
+
+        <!-- Compatibility ID for Milestone 4 JavaScript -->
+        <div id="milestone4Section"
+             class="analytics-page milestone4-page">
+
+
+            <!-- =================================================
+                 M4 HEADER
+                 ================================================= -->
+
+            <div class="analytics-header">
+
+                <div>
+
+                    <div class="analytics-label">
+                        MILESTONE 4
+                    </div>
+
+                    <h2>
+                        Packaging, Testing &amp; Finalization
+                    </h2>
+
+                    <p>
+                        Package CareerCast as a reusable Python
+                        library, validate the complete system,
+                        enhance the Streamlit interface and
+                        prepare the project for final release.
+                    </p>
+
+                </div>
+
+
+                <div class="analytics-status"
+                     id="m4OverallStatus">
+                    ● Release Ready
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 OVERALL RELEASE STATUS
+                 ================================================= -->
+
+            <div class="card m4-overall-card">
+
+                <div class="m4-overall-content">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            FINAL RELEASE STATUS
+                        </div>
+
+                        <h3>
+                            CareerCast Finalization
+                        </h3>
+
+                        <p class="muted">
+                            Packaging, testing, cohort analytics,
+                            career comparison, PDF export,
+                            documentation and release preparation.
+                        </p>
+
+                    </div>
+
+
+                    <div class="m4-status-indicator">
+
+                        <span id="m4ReleaseIndicator">
+                            ●
+                        </span>
+
+                        <strong id="m4ReleaseText">
+                            Ready for Release
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 M4 SUMMARY
+                 ================================================= -->
+
+            <div class="analytics-stats">
+
+                <div class="analytics-stat-card">
+
+                    <span class="stat-title">
+                        Package
+                    </span>
+
+                    <strong id="m4PackageStatus">
+                        Ready
+                    </strong>
+
+                    <small>
+                        Pip-installable package
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-stat-card">
+
+                    <span class="stat-title">
+                        Tests
+                    </span>
+
+                    <strong id="m4TestStatus">
+                        51 / 51
+                    </strong>
+
+                    <small>
+                        Tests passed
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-stat-card">
+
+                    <span class="stat-title">
+                        Documentation
+                    </span>
+
+                    <strong id="m4DocumentationStatus">
+                        Ready
+                    </strong>
+
+                    <small>
+                        Public documentation
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-stat-card">
+
+                    <span class="stat-title">
+                        Finalization
+                    </span>
+
+                    <strong id="m4FinalizationStatus">
+                        Ready
+                    </strong>
+
+                    <small>
+                        Release readiness
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 01. PYTHON PACKAGE & CLI
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            01
+                        </div>
+
+                        <h3>
+                            Python Package &amp; CLI
+                        </h3>
+
+                        <p class="muted">
+                            Package CareerCast as a reusable,
+                            pip-installable Python library with
+                            complete CLI support.
+                        </p>
+
+                    </div>
+
+
+                    <span class="m4-badge"
+                          id="m4PipStatus">
+                        ● Package Ready
+                    </span>
+
+                </div>
+
+
+                <div class="milestone-features">
+
+                    <div class="feature-box">
+
+                        <span>
+                            01
+                        </span>
+
+                        <h4>
+                            Package Structure
+                        </h4>
+
+                        <p>
+                            CareerCast core functionality is
+                            organized inside the reusable
+                            careercast Python package.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            02
+                        </span>
+
+                        <h4>
+                            Resume Parser
+                        </h4>
+
+                        <p>
+                            Reusable PDF, DOCX and TXT resume
+                            parsing functionality.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            03
+                        </span>
+
+                        <h4>
+                            Career Predictor
+                        </h4>
+
+                        <p>
+                            Reusable career prediction and
+                            model information functions.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            04
+                        </span>
+
+                        <h4>
+                            CLI Interface
+                        </h4>
+
+                        <p>
+                            CareerCast provides command-line
+                            commands for prediction,
+                            recommendations and model information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="m4-code-box">
+
+                    <div class="m4-code-title">
+                        CLI Example
+                    </div>
+
+                    <code>
+                        careercast predict resume.pdf
+                    </code>
+
+                </div>
+
+
+                <div class="m4-package-status-row">
+
+                    <div class="m4-check-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                pyproject.toml
+                            </strong>
+
+                            <small>
+                                Package configuration available
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-check-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                careercast package
+                            </strong>
+
+                            <small>
+                                Core package modules available
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-check-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong id="m4CLIStatus">
+                                CLI Available
+                            </strong>
+
+                            <small>
+                                Command-line interface verified
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 02. INTEGRATION & REGRESSION TESTING
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            02
+                        </div>
+
+                        <h3>
+                            Integration &amp; Regression Testing
+                        </h3>
+
+                        <p class="muted">
+                            Test the resume parsing, career prediction,
+                            recommendation and existing application
+                            functionality.
+                        </p>
+
+                    </div>
+
+
+                    <span class="m4-badge"
+                          id="m4TestingBadge">
+                        ● Tests Passed
+                    </span>
+
+                </div>
+
+
+                <div class="m4-test-summary">
+
+                    <div class="m4-test-stat">
+
+                        <strong id="m4TestsPassed">
+                            51
+                        </strong>
+
+                        <span>
+                            Tests Passed
+                        </span>
+
+                    </div>
+
+
+                    <div class="m4-test-stat">
+
+                        <strong id="m4TestsFailed">
+                            0
+                        </strong>
+
+                        <span>
+                            Tests Failed
+                        </span>
+
+                    </div>
+
+
+                    <div class="m4-test-stat">
+
+                        <strong id="m4TestsTotal">
+                            51
+                        </strong>
+
+                        <span>
+                            Total Tests
+                        </span>
+
+                    </div>
+
+
+                    <div class="m4-test-stat">
+
+                        <strong id="m4TestCoverageStatus">
+                            100%
+                        </strong>
+
+                        <span>
+                            Test Pass Rate
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="m4-test-grid">
+
+                    <div class="m4-test-item">
+
+                        <span class="m4-test-icon">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Resume Parsing
+                            </strong>
+
+                            <p>
+                                PDF, DOCX and TXT parsing tests.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-test-item">
+
+                        <span class="m4-test-icon">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Career Prediction
+                            </strong>
+
+                            <p>
+                                Prediction and model loading tests.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-test-item">
+
+                        <span class="m4-test-icon">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Recommendation Pipeline
+                            </strong>
+
+                            <p>
+                                Top-K recommendation pipeline tests.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-test-item">
+
+                        <span class="m4-test-icon">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Regression Testing
+                            </strong>
+
+                            <p>
+                                Existing CareerCast functionality
+                                verified after Milestone 4 changes.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 03. COHORT ANALYTICS
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            03
+                        </div>
+
+                        <h3>
+                            Cohort Analytics
+                        </h3>
+
+                        <p class="muted">
+                            Analyze job-market and career-role
+                            distributions using the CareerCast dataset.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="analytics-stats m4-cohort-stats">
+
+                    <div class="analytics-stat-card">
+
+                        <span class="stat-title">
+                            Dataset Records
+                        </span>
+
+                        <strong class="m4-static-cohort-value">
+                            123,849
+                        </strong>
+
+                        <small>
+                            Job records
+                        </small>
+
+                    </div>
+
+
+                    <div class="analytics-stat-card">
+
+                        <span class="stat-title">
+                            Career Roles
+                        </span>
+
+                        <strong class="m4-static-cohort-value">
+                            17
+                        </strong>
+
+                        <small>
+                            Labeled career roles
+                        </small>
+
+                    </div>
+
+
+                    <div class="analytics-stat-card">
+
+                        <span class="stat-title">
+                            Top Career
+                        </span>
+
+                        <strong class="m4-static-cohort-value">
+                            Sales Representative
+                        </strong>
+
+                        <small>
+                            Highest representation
+                        </small>
+
+                    </div>
+
+
+                    <div class="analytics-stat-card">
+
+                        <span class="stat-title">
+                            Model Accuracy
+                        </span>
+
+                        <strong class="m4-static-cohort-value">
+                            75.7%
+                        </strong>
+
+                        <small>
+                            Best available model
+                        </small>
+
+                    </div>
+
+                </div>
+
+
+                <div class="analytics-two-column">
+
+                    <div class="card m4-inner-card">
+
+                        <h4>
+                            Career Distribution
+                        </h4>
+
+                        <p class="muted">
+                            Distribution of labeled career roles.
+                        </p>
+
+                        <div class="analytics-chart"
+                             style="height:320px;">
+
+                            <canvas id="cohortCareerChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="card m4-inner-card">
+
+                        <h4>
+                            Cohort Summary
+                        </h4>
+
+                        <div id="cohortSummary"
+                             class="m4-summary-list">
+
+                            <div class="m4-summary-row">
+
+                                <span>
+                                    Dataset
+                                </span>
+
+                                <strong>
+                                    CareerCast Job Dataset
+                                </strong>
+
+                            </div>
+
+
+                            <div class="m4-summary-row">
+
+                                <span>
+                                    Records
+                                </span>
+
+                                <strong>
+                                    123,849
+                                </strong>
+
+                            </div>
+
+
+                            <div class="m4-summary-row">
+
+                                <span>
+                                    Advanced labeled records
+                                </span>
+
+                                <strong>
+                                    15,438
+                                </strong>
+
+                            </div>
+
+
+                            <div class="m4-summary-row">
+
+                                <span>
+                                    Training records
+                                </span>
+
+                                <strong>
+                                    12,350
+                                </strong>
+
+                            </div>
+
+
+                            <div class="m4-summary-row">
+
+                                <span>
+                                    Testing records
+                                </span>
+
+                                <strong>
+                                    3,088
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 04. CAREER COMPARISON
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            04
+                        </div>
+
+                        <h3>
+                            Career Comparison
+                        </h3>
+
+                        <p class="muted">
+                            Compare career paths using required skills,
+                            candidate alignment and recommendation scores.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="m4-career-controls">
+
+                    <div>
+
+                        <label for="careerCompareOne">
+                            Career 1
+                        </label>
+
+                        <select id="careerCompareOne">
+
+                            <option value="Data Scientist">
+                                Data Scientist
+                            </option>
+
+                            <option value="Machine Learning Engineer">
+                                Machine Learning Engineer
+                            </option>
+
+                            <option value="Software Engineer">
+                                Software Engineer
+                            </option>
+
+                            <option value="Data Analyst">
+                                Data Analyst
+                            </option>
+
+                            <option value="Product Manager">
+                                Product Manager
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="careerCompareTwo">
+                            Career 2
+                        </label>
+
+                        <select id="careerCompareTwo">
+
+                            <option value="Machine Learning Engineer">
+                                Machine Learning Engineer
+                            </option>
+
+                            <option value="Data Scientist">
+                                Data Scientist
+                            </option>
+
+                            <option value="Software Engineer">
+                                Software Engineer
+                            </option>
+
+                            <option value="Data Analyst">
+                                Data Analyst
+                            </option>
+
+                            <option value="Product Manager">
+                                Product Manager
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <button type="button"
+                            id="compareCareerBtn"
+                            class="btn-primary">
+                        Compare Careers
+                    </button>
+
+                </div>
+
+
+                <div id="careerComparisonResult"
+                     class="m4-comparison-result">
+
+                    <div class="m4-comparison-card">
+
+                        <h4 id="comparisonCareerOneName">
+                            Data Scientist
+                        </h4>
+
+                        <div class="m4-comparison-score">
+
+                            <span>
+                                Skill Alignment
+                            </span>
+
+                            <strong id="comparisonCareerOneAlignment">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="m4-skill-list"
+                             id="comparisonCareerOneSkills">
+
+                            <span>
+                                Python
+                            </span>
+
+                            <span>
+                                SQL
+                            </span>
+
+                            <span>
+                                Machine Learning
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-comparison-vs">
+                        VS
+                    </div>
+
+
+                    <div class="m4-comparison-card">
+
+                        <h4 id="comparisonCareerTwoName">
+                            Machine Learning Engineer
+                        </h4>
+
+                        <div class="m4-comparison-score">
+
+                            <span>
+                                Skill Alignment
+                            </span>
+
+                            <strong id="comparisonCareerTwoAlignment">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="m4-skill-list"
+                             id="comparisonCareerTwoSkills">
+
+                            <span>
+                                Python
+                            </span>
+
+                            <span>
+                                Machine Learning
+                            </span>
+
+                            <span>
+                                TensorFlow
+                            </span>
 
                         </div>
 
@@ -1701,71 +2569,473 @@
                 </div>
 
 
-                <!-- =================================================
-                     REQUIRED SKILLS
-                     ================================================= -->
-
-                <div class="card analytics-card">
-
-                    <h3>
-                        Required Skills for Your Target Career
-                    </h3>
-
-                    <p class="muted">
-                        Complete skill requirements and
-                        their current status.
-                    </p>
 
 
-                    <div id="sgRequiredSkills"
-                         class="sg-badge-container">
-
-                    </div>
-
-                </div>
+            </div>
 
 
-                <!-- =================================================
-                     LEARNING PATH
-                     ================================================= -->
+            <!-- =================================================
+                 05. PDF EXPORT
+                 ================================================= -->
 
-                <div class="card analytics-card">
+            <div class="card analytics-card">
 
-                    <h3>
-                        Recommended Learning Path
-                    </h3>
+                <div class="m4-section-heading">
 
-                    <p class="muted">
-                        Focus on the missing skills below
-                        to improve your alignment.
-                    </p>
+                    <div>
 
+                        <div class="analytics-label">
+                            05
+                        </div>
 
-                    <div id="sgLearningPath"
-                         class="sg-learning-path">
+                        <h3>
+                            PDF Export
+                        </h3>
+
+                        <p class="muted">
+                            Generate a downloadable CareerCast
+                            project analytics and finalization report.
+                        </p>
 
                     </div>
 
                 </div>
 
 
-                <!-- =================================================
-                     TOP ROLES
-                     ================================================= -->
+                <div class="m4-export-box">
 
-                <div class="card analytics-card">
+                    <div>
 
-                    <h3>
-                        Top Predicted Job Roles
-                    </h3>
+                        <h4>
+                            CareerCast Project Report
+                        </h4>
 
-                    <p class="muted">
-                        Career roles ranked from your
-                        latest resume analysis.
-                    </p>
+                        <p class="muted">
+                            Includes model information, cohort analytics,
+                            career comparison, testing and release readiness.
+                        </p>
+
+                    </div>
 
 
-                    <div id="sgTopRoles">
+                    <button type="button"
+                            id="exportMilestone4Btn"
+                            class="btn-primary">
+                        Export PDF Report
+                    </button>
+
+                </div>
+
+
+                <div id="m4ExportStatus"
+                     class="status-msg">
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 06. DOCUMENTATION & PUBLIC RELEASE
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            06
+                        </div>
+
+                        <h3>
+                            Documentation &amp; Public Release
+                        </h3>
+
+                        <p class="muted">
+                            Complete documentation prepared for
+                            project submission and public release.
+                        </p>
+
+                    </div>
+
+
+                    <span class="m4-badge"
+                          id="m4APIDocStatus">
+                        ● Documentation Ready
+                    </span>
+
+                </div>
+
+
+                <div class="milestone-features">
+
+                    <div class="feature-box">
+
+                        <span>
+                            01
+                        </span>
+
+                        <h4>
+                            README
+                        </h4>
+
+                        <p>
+                            Installation, usage, architecture,
+                            workflow and project documentation.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            02
+                        </span>
+
+                        <h4>
+                            API Reference
+                        </h4>
+
+                        <p>
+                            Documentation of CareerCast package
+                            functions, interfaces and APIs.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            03
+                        </span>
+
+                        <h4>
+                            Dataset Card
+                        </h4>
+
+                        <p>
+                            Dataset source, structure, preprocessing,
+                            role labeling and limitations.
+                        </p>
+
+                    </div>
+
+
+                    <div class="feature-box">
+
+                        <span>
+                            04
+                        </span>
+
+                        <h4>
+                            Model Card
+                        </h4>
+
+                        <p>
+                            Model purpose, evaluation metrics,
+                            limitations and compatibility information.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="m4-documentation-list">
+
+                    <div class="m4-document-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                CLI Guide
+                            </strong>
+
+                            <small>
+                                Command-line usage documentation
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-document-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                API Reference
+                            </strong>
+
+                            <small>
+                                Python API documentation
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-document-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Dataset Card
+                            </strong>
+
+                            <small>
+                                Dataset documentation
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-document-item">
+
+                        <span>
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Model Card
+                            </strong>
+
+                            <small>
+                                Machine-learning model documentation
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 07. FINALIZATION & RELEASE READINESS
+                 ================================================= -->
+
+            <div class="card analytics-card">
+
+                <div class="m4-section-heading">
+
+                    <div>
+
+                        <div class="analytics-label">
+                            07
+                        </div>
+
+                        <h3>
+                            Finalization &amp; Release Readiness
+                        </h3>
+
+                        <p class="muted">
+                            Final verification of all Milestone 4
+                            deliverables before submission and release.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="m4-finalization-grid">
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Package Complete
+                            </strong>
+
+                            <p>
+                                CareerCast package structure and
+                                configuration are available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                API &amp; CLI Documentation Complete
+                            </strong>
+
+                            <p>
+                                API reference and command-line
+                                documentation are prepared.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Testing Complete
+                            </strong>
+
+                            <p>
+                                Integration and regression tests
+                                have been executed.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Cohort Analytics Complete
+                            </strong>
+
+                            <p>
+                                Cohort analytics and career
+                                distribution are available.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Career Comparison Ready
+                            </strong>
+
+                            <p>
+                                Career paths can be compared using
+                                skills and candidate alignment.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                PDF Export Ready
+                            </strong>
+
+                            <p>
+                                CareerCast project information
+                                can be exported as a report.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Dataset &amp; Model Cards Complete
+                            </strong>
+
+                            <p>
+                                Dataset and model documentation
+                                are prepared for public release.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="m4-finalization-item">
+
+                        <span class="m4-final-check">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Final Release Ready
+                            </strong>
+
+                            <p>
+                                Milestone 4 deliverables are
+                                prepared for final submission.
+                            </p>
+
+                        </div>
 
                     </div>
 
@@ -1784,26 +3054,20 @@
      JAVASCRIPT
      ========================================================= -->
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
-<!-- Skill Gap JS -->
-<script src="{{ url_for('static', filename='js/skillgap.js') }}"></script>
-
-
-<!-- Main Dashboard JS -->
+<!-- Main Dashboard -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
-
-<!-- Milestone 2 JS -->
+<!-- Milestone 2 -->
 <script src="{{ url_for('static', filename='js/milestone2.js') }}"></script>
 
-
-<!-- Milestone 3 API JS -->
+<!-- Milestone 3 -->
 <script src="{{ url_for('static', filename='js/api.js') }}"></script>
 
+<!-- Skill Gap -->
+<script src="{{ url_for('static', filename='js/skillgap.js') }}"></script>
+
+<!-- Milestone 4 -->
+<script src="{{ url_for('static', filename='js/milestone4.js') }}"></script>
 
 </body>
-
 </html>
-

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "careercast"
+version = "1.0.0"
+description = "AI-Powered Career Intelligence Platform for resume analysis, career prediction, recommendations, and skill gap analysis."
+readme = "README.md"
+requires-python = ">=3.10"
+
+authors = [
+    { name = "CareerCast Team" }
+]
+
+dependencies = [
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "PyPDF2",
+    "python-docx"
+]
+
+[project.scripts]
+careercast = "careercast.cli:main"
+
+[tool.setuptools]
+packages = ["careercast"]

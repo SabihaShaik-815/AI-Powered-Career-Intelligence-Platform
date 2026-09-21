@@ -3,6 +3,7 @@ import re
 import json
 import warnings
 import joblib
+
 import numpy as np
 import pandas as pd
 
@@ -15,11 +16,15 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    classification_report,
-    confusion_matrix
+    classification_report
 )
 
 from xgboost import XGBClassifier
+
+
+# ============================================================
+# WARNING SETTINGS
+# ============================================================
 
 warnings.filterwarnings("ignore")
 
@@ -35,6 +40,10 @@ os.makedirs(MODEL_DIR, exist_ok=True)
 
 RANDOM_STATE = 42
 
+
+# ============================================================
+# START
+# ============================================================
 
 print("=" * 75)
 print("AI-POWERED CAREER INTELLIGENCE PLATFORM")
@@ -105,8 +114,11 @@ ROLE_PATTERNS = {
 
 
 def label_title(title):
+    """
+    Convert a job title into a predefined career role.
+    """
 
-    title = str(title).lower()
+    title = str(title).lower().strip()
 
     for role, pattern in ROLE_PATTERNS.items():
 
@@ -123,25 +135,33 @@ def label_title(title):
 
 print("\nLoading dataset...")
 
+
 if not os.path.exists(DATA_PATH):
 
     raise FileNotFoundError(
-        f"\nDataset not found:\n{DATA_PATH}"
+        "\nDataset not found:\n"
+        + os.path.abspath(DATA_PATH)
     )
+
 
 df = pd.read_csv(DATA_PATH)
 
-print("Original dataset shape:", df.shape)
+
+print(
+    "\nOriginal dataset shape:",
+    df.shape
+)
 
 
 # ============================================================
-# 4. CHECK COLUMNS
+# 4. CHECK REQUIRED COLUMNS
 # ============================================================
 
 required_columns = [
     "title",
     "description"
 ]
+
 
 for column in required_columns:
 
@@ -156,9 +176,16 @@ for column in required_columns:
 # 5. CREATE CAREER ROLE LABEL
 # ============================================================
 
-print("\nCreating career-role labels...")
+print("\n" + "=" * 75)
+print("CREATING CAREER ROLE LABELS")
+print("=" * 75)
 
-df["career_role"] = df["title"].apply(label_title)
+
+df["career_role"] = (
+    df["title"]
+    .apply(label_title)
+)
+
 
 df = df.dropna(
     subset=[
@@ -167,20 +194,25 @@ df = df.dropna(
     ]
 ).copy()
 
+
 print(
     "\nLabeled dataset:",
     len(df)
 )
+
 
 print(
     "Number of career roles:",
     df["career_role"].nunique()
 )
 
+
 print("\nRole distribution:")
 
+
 print(
-    df["career_role"].value_counts()
+    df["career_role"]
+    .value_counts()
 )
 
 
@@ -188,11 +220,17 @@ print(
 # 6. CLEAN TEXT
 # ============================================================
 
+print("\n" + "=" * 75)
+print("CLEANING TEXT DATA")
+print("=" * 75)
+
+
 df["title"] = (
     df["title"]
     .fillna("")
     .astype(str)
 )
+
 
 df["description"] = (
     df["description"]
@@ -201,9 +239,13 @@ df["description"] = (
 )
 
 
-# Include skills if available
+# ------------------------------------------------------------
+# Include skills description if available
+# ------------------------------------------------------------
 
 if "skills_desc" in df.columns:
+
+    print("\nUsing skills_desc column.")
 
     df["skills_desc"] = (
         df["skills_desc"]
@@ -212,22 +254,31 @@ if "skills_desc" in df.columns:
     )
 
     df["combined_text"] = (
-        df["title"] + " " +
-        df["title"] + " " +
-        df["description"] + " " +
-        df["skills_desc"]
+        df["title"]
+        + " "
+        + df["title"]
+        + " "
+        + df["description"]
+        + " "
+        + df["skills_desc"]
     )
 
 else:
 
+    print("\nskills_desc column not found.")
+
     df["combined_text"] = (
-        df["title"] + " " +
-        df["title"] + " " +
-        df["description"]
+        df["title"]
+        + " "
+        + df["title"]
+        + " "
+        + df["description"]
     )
 
 
-# Limit extremely long descriptions
+# ------------------------------------------------------------
+# Limit very long descriptions
+# ------------------------------------------------------------
 
 df["combined_text"] = (
     df["combined_text"]
@@ -235,36 +286,67 @@ df["combined_text"] = (
 )
 
 
+# ------------------------------------------------------------
+# Remove empty records
+# ------------------------------------------------------------
+
+df = df[
+    df["combined_text"]
+    .str.strip()
+    .ne("")
+].copy()
+
+
+print(
+    "\nFinal usable records:",
+    len(df)
+)
+
+
 # ============================================================
 # 7. TRAIN / TEST SPLIT
 # ============================================================
+
+print("\n" + "=" * 75)
+print("TRAIN / TEST SPLIT")
+print("=" * 75)
+
 
 X = df["combined_text"]
 
 y = df["career_role"]
 
 
+# ------------------------------------------------------------
+# Encode career roles
+# ------------------------------------------------------------
+
 label_encoder = LabelEncoder()
+
 
 y_encoded = label_encoder.fit_transform(y)
 
 
-print("\nEncoded classes:")
+print("\nEncoded career classes:")
+
 
 for index, role in enumerate(
     label_encoder.classes_
 ):
 
     print(
-        index,
-        "=",
-        role
+        f"{index:3d} = {role}"
     )
 
+
+# ------------------------------------------------------------
+# Train/test split
+# ------------------------------------------------------------
 
 X_train, X_test, y_train, y_test = train_test_split(
 
     X,
+
     y_encoded,
 
     test_size=0.20,
@@ -275,19 +357,24 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 
-print("\nTraining samples:", len(X_train))
+print(
+    "\nTraining samples:",
+    len(X_train)
+)
 
-print("Testing samples :", len(X_test))
+
+print(
+    "Testing samples :",
+    len(X_test)
+)
 
 
 # ============================================================
-# 8. TF-IDF
+# 8. TF-IDF FEATURE ENGINEERING
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("CREATING TF-IDF FEATURES")
-
 print("=" * 75)
 
 
@@ -313,19 +400,32 @@ tfidf = TfidfVectorizer(
 
 print("\nFitting TF-IDF...")
 
-X_train_tfidf = tfidf.fit_transform(X_train)
 
-X_test_tfidf = tfidf.transform(X_test)
+X_train_tfidf = tfidf.fit_transform(
+    X_train
+)
+
+
+X_test_tfidf = tfidf.transform(
+    X_test
+)
 
 
 print(
-    "TF-IDF training shape:",
+    "\nTF-IDF training shape:",
     X_train_tfidf.shape
 )
+
 
 print(
     "TF-IDF testing shape :",
     X_test_tfidf.shape
+)
+
+
+print(
+    "TF-IDF vocabulary size:",
+    len(tfidf.vocabulary_)
 )
 
 
@@ -334,9 +434,7 @@ print(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("RANDOM FOREST")
-
 print("=" * 75)
 
 
@@ -353,33 +451,29 @@ rf = RandomForestClassifier(
 rf_params = {
 
     "n_estimators": [
+        150,
         200,
-        300,
-        400
+        250
     ],
 
     "max_depth": [
         20,
         30,
-        40,
         None
     ],
 
     "min_samples_split": [
         2,
-        5,
-        10
+        5
     ],
 
     "min_samples_leaf": [
         1,
-        2,
-        4
+        2
     ],
 
     "max_features": [
-        "sqrt",
-        "log2"
+        "sqrt"
     ]
 }
 
@@ -390,7 +484,7 @@ rf_search = RandomizedSearchCV(
 
     param_distributions=rf_params,
 
-    n_iter=10,
+    n_iter=5,
 
     cv=3,
 
@@ -408,23 +502,33 @@ print(
     "\nTraining Random Forest..."
 )
 
+
 rf_search.fit(
+
     X_train_tfidf,
+
     y_train
 )
 
 
-rf_model = rf_search.best_estimator_
+rf_model = (
+    rf_search.best_estimator_
+)
 
 
 print(
     "\nBest Random Forest parameters:"
 )
 
+
 print(
     rf_search.best_params_
 )
 
+
+# ------------------------------------------------------------
+# Random Forest prediction
+# ------------------------------------------------------------
 
 rf_pred = rf_model.predict(
     X_test_tfidf
@@ -436,49 +540,68 @@ rf_pred = rf_model.predict(
 # ============================================================
 
 rf_accuracy = accuracy_score(
+
     y_test,
+
     rf_pred
 )
 
+
 rf_precision = precision_score(
+
     y_test,
+
     rf_pred,
+
     average="weighted",
+
     zero_division=0
 )
+
 
 rf_recall = recall_score(
+
     y_test,
+
     rf_pred,
+
     average="weighted",
+
     zero_division=0
 )
 
+
 rf_f1 = f1_score(
+
     y_test,
+
     rf_pred,
+
     average="weighted",
+
     zero_division=0
 )
 
 
 print("\n" + "-" * 60)
-
 print("RANDOM FOREST RESULTS")
-
 print("-" * 60)
+
 
 print(
     f"Accuracy  : {rf_accuracy * 100:.2f}%"
 )
 
+
 print(
     f"Precision : {rf_precision * 100:.2f}%"
 )
 
+
 print(
     f"Recall    : {rf_recall * 100:.2f}%"
 )
+
 
 print(
     f"F1 Score  : {rf_f1 * 100:.2f}%"
@@ -490,9 +613,7 @@ print(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("XGBOOST")
-
 print("=" * 75)
 
 
@@ -510,16 +631,18 @@ xgb = XGBClassifier(
 
     n_jobs=-1,
 
-    tree_method="hist"
+    tree_method="hist",
+
+    verbosity=0
 )
 
 
 xgb_params = {
 
     "n_estimators": [
+        150,
         200,
-        300,
-        400
+        250
     ],
 
     "max_depth": [
@@ -552,7 +675,7 @@ xgb_search = RandomizedSearchCV(
 
     param_distributions=xgb_params,
 
-    n_iter=10,
+    n_iter=5,
 
     cv=3,
 
@@ -588,10 +711,15 @@ print(
     "\nBest XGBoost parameters:"
 )
 
+
 print(
     xgb_search.best_params_
 )
 
+
+# ------------------------------------------------------------
+# XGBoost prediction
+# ------------------------------------------------------------
 
 xgb_pred = xgb_model.predict(
     X_test_tfidf
@@ -603,49 +731,68 @@ xgb_pred = xgb_model.predict(
 # ============================================================
 
 xgb_accuracy = accuracy_score(
+
     y_test,
+
     xgb_pred
 )
 
+
 xgb_precision = precision_score(
+
     y_test,
+
     xgb_pred,
+
     average="weighted",
+
     zero_division=0
 )
+
 
 xgb_recall = recall_score(
+
     y_test,
+
     xgb_pred,
+
     average="weighted",
+
     zero_division=0
 )
 
+
 xgb_f1 = f1_score(
+
     y_test,
+
     xgb_pred,
+
     average="weighted",
+
     zero_division=0
 )
 
 
 print("\n" + "-" * 60)
-
 print("XGBOOST RESULTS")
-
 print("-" * 60)
+
 
 print(
     f"Accuracy  : {xgb_accuracy * 100:.2f}%"
 )
 
+
 print(
     f"Precision : {xgb_precision * 100:.2f}%"
 )
 
+
 print(
     f"Recall    : {xgb_recall * 100:.2f}%"
 )
+
 
 print(
     f"F1 Score  : {xgb_f1 * 100:.2f}%"
@@ -657,10 +804,9 @@ print(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("RANDOM FOREST CLASSIFICATION REPORT")
-
 print("=" * 75)
+
 
 print(
     classification_report(
@@ -677,10 +823,9 @@ print(
 
 
 print("\n" + "=" * 75)
-
 print("XGBOOST CLASSIFICATION REPORT")
-
 print("=" * 75)
+
 
 print(
     classification_report(
@@ -701,22 +846,25 @@ print(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("MODEL COMPARISON")
-
 print("=" * 75)
 
 
 print(
-    f"Random Forest : "
+    f"\nRandom Forest : "
     f"{rf_accuracy * 100:.2f}%"
 )
+
 
 print(
     f"XGBoost       : "
     f"{xgb_accuracy * 100:.2f}%"
 )
 
+
+# ------------------------------------------------------------
+# Select best model
+# ------------------------------------------------------------
 
 if rf_accuracy >= xgb_accuracy:
 
@@ -736,9 +884,9 @@ else:
 
 
 print(
-    f"\nBest Model: "
-    f"{best_name}"
+    f"\nBest Model   : {best_name}"
 )
+
 
 print(
     f"Best Accuracy: "
@@ -751,20 +899,39 @@ print(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("SAVING MODELS")
-
 print("=" * 75)
+
+
+# ------------------------------------------------------------
+# Random Forest
+# ------------------------------------------------------------
+
+rf_model_path = os.path.join(
+
+    MODEL_DIR,
+
+    "random_forest_model.pkl"
+)
 
 
 joblib.dump(
 
     rf_model,
 
-    os.path.join(
-        MODEL_DIR,
-        "random_forest_model.pkl"
-    )
+    rf_model_path
+)
+
+
+# ------------------------------------------------------------
+# XGBoost
+# ------------------------------------------------------------
+
+xgb_model_path = os.path.join(
+
+    MODEL_DIR,
+
+    "xgboost_model.pkl"
 )
 
 
@@ -772,10 +939,19 @@ joblib.dump(
 
     xgb_model,
 
-    os.path.join(
-        MODEL_DIR,
-        "xgboost_model.pkl"
-    )
+    xgb_model_path
+)
+
+
+# ------------------------------------------------------------
+# TF-IDF vectorizer
+# ------------------------------------------------------------
+
+tfidf_path = os.path.join(
+
+    MODEL_DIR,
+
+    "career_tfidf_vectorizer.pkl"
 )
 
 
@@ -783,10 +959,19 @@ joblib.dump(
 
     tfidf,
 
-    os.path.join(
-        MODEL_DIR,
-        "career_tfidf_vectorizer.pkl"
-    )
+    tfidf_path
+)
+
+
+# ------------------------------------------------------------
+# Label encoder
+# ------------------------------------------------------------
+
+label_encoder_path = os.path.join(
+
+    MODEL_DIR,
+
+    "career_label_encoder.pkl"
 )
 
 
@@ -794,16 +979,58 @@ joblib.dump(
 
     label_encoder,
 
-    os.path.join(
-        MODEL_DIR,
-        "career_label_encoder.pkl"
-    )
+    label_encoder_path
+)
+
+
+print(
+    "\nRandom Forest saved:"
+)
+
+
+print(
+    os.path.abspath(rf_model_path)
+)
+
+
+print(
+    "\nXGBoost saved:"
+)
+
+
+print(
+    os.path.abspath(xgb_model_path)
+)
+
+
+print(
+    "\nTF-IDF vectorizer saved:"
+)
+
+
+print(
+    os.path.abspath(tfidf_path)
+)
+
+
+print(
+    "\nLabel encoder saved:"
+)
+
+
+print(
+    os.path.abspath(label_encoder_path)
 )
 
 
 # ============================================================
 # 16. SAVE METRICS
 # ============================================================
+
+print("\n" + "=" * 75)
+print("SAVING METRICS")
+print("=" * 75)
+
 
 metrics = {
 
@@ -831,8 +1058,12 @@ metrics = {
             round(
                 rf_f1 * 100,
                 2
-            )
+            ),
+
+        "best_params":
+            rf_search.best_params_
     },
+
 
     "xgboost": {
 
@@ -858,35 +1089,111 @@ metrics = {
             round(
                 xgb_f1 * 100,
                 2
-            )
+            ),
+
+        "best_params":
+            xgb_search.best_params_
     },
+
 
     "best_model":
         best_name,
+
 
     "best_accuracy":
         round(
             best_accuracy * 100,
             2
-        )
+        ),
+
+
+    "dataset": {
+
+        "original_rows":
+            int(
+                len(
+                    pd.read_csv(DATA_PATH)
+                )
+            ),
+
+        "labeled_rows":
+            int(
+                len(df)
+            ),
+
+        "career_roles":
+            int(
+                df["career_role"].nunique()
+            ),
+
+        "training_samples":
+            int(
+                len(X_train)
+            ),
+
+        "testing_samples":
+            int(
+                len(X_test)
+            )
+    },
+
+
+    "feature_engineering": {
+
+        "method":
+            "TF-IDF",
+
+        "max_features":
+            20000,
+
+        "ngram_range":
+            [1, 2],
+
+        "min_df":
+            2,
+
+        "max_df":
+            0.95
+    }
 }
+
+
+metrics_path = os.path.join(
+
+    MODEL_DIR,
+
+    "advanced_metrics.json"
+)
 
 
 with open(
 
-    os.path.join(
-        MODEL_DIR,
-        "advanced_metrics.json"
-    ),
+    metrics_path,
 
-    "w"
+    "w",
+
+    encoding="utf-8"
+
 ) as file:
 
     json.dump(
+
         metrics,
+
         file,
+
         indent=4
     )
+
+
+print(
+    "\nMetrics saved:"
+)
+
+
+print(
+    os.path.abspath(metrics_path)
+)
 
 
 # ============================================================
@@ -894,37 +1201,83 @@ with open(
 # ============================================================
 
 print("\n" + "=" * 75)
-
 print("FINAL MILESTONE 2 RESULTS")
-
 print("=" * 75)
+
 
 print(
     f"\nRandom Forest Accuracy : "
     f"{rf_accuracy * 100:.2f}%"
 )
 
+
 print(
-    f"XGBoost Accuracy       : "
+    f"Random Forest Precision: "
+    f"{rf_precision * 100:.2f}%"
+)
+
+
+print(
+    f"Random Forest Recall   : "
+    f"{rf_recall * 100:.2f}%"
+)
+
+
+print(
+    f"Random Forest F1 Score : "
+    f"{rf_f1 * 100:.2f}%"
+)
+
+
+print(
+    f"\nXGBoost Accuracy       : "
     f"{xgb_accuracy * 100:.2f}%"
 )
+
+
+print(
+    f"XGBoost Precision      : "
+    f"{xgb_precision * 100:.2f}%"
+)
+
+
+print(
+    f"XGBoost Recall         : "
+    f"{xgb_recall * 100:.2f}%"
+)
+
+
+print(
+    f"XGBoost F1 Score       : "
+    f"{xgb_f1 * 100:.2f}%"
+)
+
 
 print(
     f"\nBest Model             : "
     f"{best_name}"
 )
 
+
 print(
     f"Best Accuracy          : "
     f"{best_accuracy * 100:.2f}%"
 )
 
-print("\nModels saved in:")
+
+print(
+    "\nModels saved in:"
+)
+
 
 print(
     os.path.abspath(MODEL_DIR)
 )
 
-print("\nTraining completed successfully!")
+
+print(
+    "\nTraining completed successfully!"
+)
+
 
 print("=" * 75)
